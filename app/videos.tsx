@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity, Animated, Easing } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { getStreams, StreamInfo } from '../src/api/streams';
 import { getMemberSettings } from '../src/services/memberSettings';
@@ -15,6 +15,7 @@ export default function VideoListScreen() {
     const [refreshing, setRefreshing] = useState(false);
 
     const scrollY = useRef(new Animated.Value(0)).current;
+    const spinAnim = useRef(new Animated.Value(0)).current;
 
     const loadVideos = useCallback(async (force = false) => {
         try {
@@ -60,6 +61,22 @@ export default function VideoListScreen() {
         setVideos(allVideos.slice(0, visibleCount));
     }, [allVideos, visibleCount]);
 
+    // Constant spinning during refresh
+    useEffect(() => {
+        if (refreshing) {
+            Animated.loop(
+                Animated.timing(spinAnim, {
+                    toValue: 1,
+                    duration: 1000,
+                    easing: Easing.linear,
+                    useNativeDriver: true,
+                })
+            ).start();
+        } else {
+            spinAnim.setValue(0);
+        }
+    }, [refreshing]);
+
     const onRefresh = () => {
         setRefreshing(true);
         loadVideos(true);
@@ -74,6 +91,11 @@ export default function VideoListScreen() {
         inputRange: [-100, 0],
         outputRange: ['180deg', '0deg'],
         extrapolate: 'clamp',
+    });
+
+    const activeSpinRotate = spinAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '360deg'],
     });
 
     const pullIconScale = scrollY.interpolate({
@@ -103,11 +125,14 @@ export default function VideoListScreen() {
             <Animated.View style={[
                 styles.pullIndicator,
                 {
-                    opacity: refreshing ? 0 : pullIndicatorOpacity,
-                    transform: [{ scale: pullIconScale }, { rotate: pullIconRotate }]
+                    opacity: refreshing ? 1 : pullIndicatorOpacity,
+                    transform: [
+                        { scale: refreshing ? 1 : pullIconScale },
+                        { rotate: refreshing ? activeSpinRotate : pullIconRotate }
+                    ]
                 }
             ]}>
-                <Ionicons name="refresh-circle" size={48} color={COLORS.primary} />
+                <Ionicons name="refresh-circle" size={48} color="#222" />
             </Animated.View>
 
             <Animated.FlatList
@@ -119,14 +144,14 @@ export default function VideoListScreen() {
                     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
                     { useNativeDriver: true }
                 )}
+                scrollEventThrottle={16}
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                        tintColor={COLORS.primary}
-                        colors={[COLORS.primary]}
-                        progressBackgroundColor={COLORS.cardBackground}
-                        progressViewOffset={40}
+                        tintColor="transparent"
+                        colors={['transparent']}
+                        progressBackgroundColor="transparent"
                     />
                 }
                 ListFooterComponent={
@@ -176,11 +201,11 @@ const styles = StyleSheet.create({
     },
     pullIndicator: {
         position: 'absolute',
-        top: 20,
+        top: 30,
         left: 0,
         right: 0,
         alignItems: 'center',
-        zIndex: 0,
+        zIndex: 10,
     },
     listContent: {
         paddingTop: 12,

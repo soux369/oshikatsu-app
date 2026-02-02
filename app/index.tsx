@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity, Animated, Easing } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { getStreams, StreamInfo } from '../src/api/streams';
 import { getMemberSettings } from '../src/services/memberSettings';
@@ -15,6 +15,7 @@ export default function StreamListScreen() {
     const [refreshing, setRefreshing] = useState(false);
 
     const scrollY = useRef(new Animated.Value(0)).current;
+    const spinAnim = useRef(new Animated.Value(0)).current;
 
     const loadStreams = useCallback(async (force = false) => {
         try {
@@ -57,6 +58,22 @@ export default function StreamListScreen() {
         setStreams([...allData.liveAndUpcoming, ...displayEnded]);
     }, [allData, visibleCount]);
 
+    // Constant spinning during refresh
+    useEffect(() => {
+        if (refreshing) {
+            Animated.loop(
+                Animated.timing(spinAnim, {
+                    toValue: 1,
+                    duration: 1000,
+                    easing: Easing.linear,
+                    useNativeDriver: true,
+                })
+            ).start();
+        } else {
+            spinAnim.setValue(0);
+        }
+    }, [refreshing]);
+
     const onRefresh = () => {
         setRefreshing(true);
         loadStreams(true);
@@ -71,6 +88,11 @@ export default function StreamListScreen() {
         inputRange: [-100, 0],
         outputRange: ['180deg', '0deg'],
         extrapolate: 'clamp',
+    });
+
+    const activeSpinRotate = spinAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '360deg'],
     });
 
     const pullIconScale = scrollY.interpolate({
@@ -97,15 +119,18 @@ export default function StreamListScreen() {
 
     return (
         <View style={styles.container}>
-            {/* Custom Refresh Indicator inside the pulled space */}
+            {/* Custom Pull Indicator - Now Dark Colored (#222) and stays during refreshing */}
             <Animated.View style={[
                 styles.pullIndicator,
                 {
-                    opacity: refreshing ? 0 : pullIndicatorOpacity,
-                    transform: [{ scale: pullIconScale }, { rotate: pullIconRotate }]
+                    opacity: refreshing ? 1 : pullIndicatorOpacity,
+                    transform: [
+                        { scale: refreshing ? 1 : pullIconScale },
+                        { rotate: refreshing ? activeSpinRotate : pullIconRotate }
+                    ]
                 }
             ]}>
-                <Ionicons name="refresh-circle" size={48} color={COLORS.primary} />
+                <Ionicons name="refresh-circle" size={48} color="#222" />
             </Animated.View>
 
             <Animated.FlatList
@@ -117,14 +142,15 @@ export default function StreamListScreen() {
                     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
                     { useNativeDriver: true }
                 )}
+                scrollEventThrottle={16}
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                        tintColor={COLORS.primary}
-                        colors={[COLORS.primary]}
-                        progressBackgroundColor={COLORS.cardBackground}
-                        progressViewOffset={40}
+                        tintColor="transparent" // Hide default spinner on iOS
+                        colors={['transparent']} // Hide default spinner on Android
+                        progressBackgroundColor="transparent" // Fix "black mark" background
+                        style={{ backgroundColor: 'transparent' }}
                     />
                 }
                 ListFooterComponent={
@@ -174,17 +200,16 @@ const styles = StyleSheet.create({
     },
     pullIndicator: {
         position: 'absolute',
-        top: 20,
+        top: 30, // Slightly lower for visibility
         left: 0,
         right: 0,
         alignItems: 'center',
-        zIndex: 0,
+        zIndex: 10, // Ensure it's above other things if needed, though usually zIndex 0 is fine with flatlist transparency
     },
     listContent: {
         paddingTop: 12,
         paddingBottom: 80,
         flexGrow: 1,
-        backgroundColor: 'transparent',
     },
     emptyContainer: {
         padding: 40,
