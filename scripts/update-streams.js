@@ -33,7 +33,7 @@ async function update() {
         const channelIds = MEMBERS.map(m => m.id);
         const uploadsMap = await fetchUploadsPlaylistIds(channelIds);
 
-        console.log('Fetching latest videos from playlists...');
+        console.log('Fetching latest videos from playlists (max 20)...');
         let allVideoIds = [];
         let fetchedPlaylistsCount = 0;
 
@@ -41,8 +41,6 @@ async function update() {
         const playlistPromises = MEMBERS.map(async (member) => {
             let playlistId = uploadsMap[member.id];
             if (!playlistId) {
-                // Fallback: Use UU replacement if API didn't return (or failed)
-                // console.warn(`Fallback to UU for ${member.name}`);
                 playlistId = member.id.replace(/^UC/, 'UU');
             }
             const videoIds = await fetchRecentVideosFromPlaylist(playlistId);
@@ -99,7 +97,6 @@ async function fetchUploadsPlaylistIds(channelIds) {
             }
         });
 
-        // Create Map: ChannelID -> UploadsID
         const map = {};
         response.data.items.forEach(item => {
             map[item.id] = item.contentDetails.relatedPlaylists.uploads;
@@ -118,13 +115,12 @@ async function fetchRecentVideosFromPlaylist(playlistId) {
             params: {
                 part: 'snippet,contentDetails',
                 playlistId: playlistId,
-                maxResults: 10,
+                maxResults: 20, // Increased to 20 to find more videos hidden behind streams
                 key: API_KEY,
             }
         });
         return response.data.items.map(item => item.contentDetails.videoId);
     } catch (error) {
-        // console.warn(`Failed to fetch playlist ${playlistId}`);
         return [];
     }
 }

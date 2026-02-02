@@ -27,7 +27,14 @@ export default function StreamListScreen() {
                 return isStream && isAllowed;
             });
 
-            setStreams(filtered);
+            // 3. Separate and limit ended streams
+            const liveAndUpcoming = filtered.filter(s => s.status === 'live' || s.status === 'upcoming');
+            const ended = filtered.filter(s => s.status === 'ended');
+
+            // Limit ended streams (archives) to avoid clutter, user requested max 10
+            const restrictedEnded = ended.slice(0, 10);
+
+            setStreams([...liveAndUpcoming, ...restrictedEnded]);
         } catch (error) {
             console.error('Failed to load streams', error);
         } finally {
