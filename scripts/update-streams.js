@@ -36,12 +36,18 @@ async function update() {
         console.log(`Fetching latest videos from ${uploadsIds.length} playlists...`);
         let allVideoIds = [];
 
-        const promises = uploadsIds.map(async (playlistId) => {
+        // 1. Fetch recent videos/archives from Playlists (Reliable for past content)
+        const playlistPromises = uploadsIds.map(async (playlistId) => {
             return await fetchRecentVideosFromPlaylist(playlistId);
         });
+        const playlistResults = await Promise.all(playlistPromises);
+        playlistResults.forEach(ids => allVideoIds.push(...ids));
 
-        const results = await Promise.all(promises);
-        results.forEach(ids => allVideoIds.push(...ids));
+        // 2. Fetch Upcoming Streams explicitly via Search API (Reliable for future content)
+        // Playlists sometimes lag for upcoming streams
+        console.log('Fetching upcoming streams from Search API...');
+        const upcomingIds = await fetchUpcomingStreams();
+        allVideoIds.push(...upcomingIds);
 
         // Deduplicate
         allVideoIds = [...new Set(allVideoIds)];
@@ -83,8 +89,6 @@ async function fetchUploadsPlaylistIds(channelIds) {
                 key: API_KEY,
             }
         });
-
-        // Extract uploads playlist ID
         return response.data.items.map(item => item.contentDetails.relatedPlaylists.uploads);
     } catch (error) {
         console.error('Channels API failed:', error.message);
@@ -110,6 +114,31 @@ async function fetchRecentVideosFromPlaylist(playlistId) {
     }
 }
 
+async function fetchUpcomingStreams() {
+    const url = `https://www.googleapis.com/youtube/v3/search`;
+    const CHANNEL_IDS = MEMBERS.map(m => m.id);
+    try {
+        const response = await axios.get(url, {
+            params: {
+                part: 'snippet',
+                q: 'あおぎり高校',
+                type: 'video',
+                eventType: 'upcoming',
+                key: API_KEY,
+                maxResults: 50,
+                order: 'date',
+            }
+        });
+
+        return response.data.items
+            .filter(item => CHANNEL_IDS.includes(item.snippet.channelId))
+            .map(item => item.id.videoId);
+    } catch (error) {
+        console.warn(`Search for upcoming failed:`, error.message);
+        return [];
+    }
+}
+
 async function fetchVideoDetails(videoIds) {
     const url = `https://www.googleapis.com/youtube/v3/videos`;
     try {
@@ -130,11 +159,7 @@ async function fetchVideoDetails(videoIds) {
             let status = item.snippet.liveBroadcastContent; // 'live', 'upcoming', 'none'
             const liveDetails = item.liveStreamingDetails;
 
-            // Determine Type
             const isStream = !!liveDetails;
-            // IMPORTANT: Some ended streams lose 'liveBroadcastContent' or become 'none'.
-            // But if they have liveStreamingDetails, they were streams.
-
             const type = isStream ? 'stream' : 'video';
 
             if (isStream) {
@@ -142,14 +167,14 @@ async function fetchVideoDetails(videoIds) {
                 if (actualEndTime || status === 'none') {
                     status = 'ended';
                 }
-                // Fail-safe
                 const startTimeStr = liveDetails.scheduledStartTime || item.snippet.publishedAt;
                 if (status === 'upcoming' && startTimeStr) {
                     const diffHours = (new Date().getTime() - new Date(startTimeStr).getTime()) / (3600 * 1000);
+                    // If > 2 hours overdue, treat as ended/stale
                     if (diffHours > 2) status = 'ended';
                 }
             } else {
-                status = 'ended'; // Regular video
+                status = 'ended';
             }
 
             const startTime = liveDetails?.scheduledStartTime || item.snippet.publishedAt;
