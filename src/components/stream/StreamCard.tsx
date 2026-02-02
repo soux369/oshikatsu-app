@@ -92,6 +92,16 @@ export default function StreamCard({ stream }: Props) {
     // Should we dim the card? Only for ended streams (archives), not for general videos.
     const isActualEndedStream = stream.type === 'stream' && stream.status === 'ended';
 
+    const getAvatarTextColor = (hexColor: string) => {
+        // Simple human perception brightness calculation (YIQ)
+        const hex = hexColor.replace('#', '');
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness > 180 ? '#222' : '#fff'; // Use dark text for bright backgrounds
+    };
+
     return (
         <TouchableOpacity
             style={[styles.card, isActualEndedStream && styles.cardEnded]}
@@ -111,7 +121,9 @@ export default function StreamCard({ stream }: Props) {
                 <View style={styles.headerRow}>
                     {member && (
                         <View style={[styles.avatarPlaceholder, { backgroundColor: member.color }]}>
-                            <Text style={styles.avatarText}>{member.name[0]}</Text>
+                            <Text style={[styles.avatarText, { color: getAvatarTextColor(member.color) }]}>
+                                {member.name[0]}
+                            </Text>
                         </View>
                     )}
                     <View style={styles.textContainer}>
