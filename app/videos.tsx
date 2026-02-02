@@ -18,10 +18,19 @@ export default function VideoListScreen() {
                 getNotificationSettings()
             ]);
 
+            // 2. Filter logic:
+            // Include both uploaded videos AND archived streams in the Video tab
             const filtered = data.filter(s => {
-                const isVideo = s.type === 'video';
+                const isContent = s.status === 'ended';
                 const isAllowed = settings[s.channelId] !== false; // Default ON
-                return isVideo && isAllowed;
+                return isContent && isAllowed;
+            });
+
+            // Ensure sorted by date (newest first)
+            filtered.sort((a, b) => {
+                const timeA = new Date(a.scheduledStartTime || 0).getTime();
+                const timeB = new Date(b.scheduledStartTime || 0).getTime();
+                return timeB - timeA;
             });
 
             setVideos(filtered);

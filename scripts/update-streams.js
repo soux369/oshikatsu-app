@@ -14,7 +14,7 @@ const MEMBERS = [
     { id: 'UCFvEuP2EDkvrgJpHI6-pyNw', name: '我部 りえる' },
     { id: 'UCAHXqn4nAd2j3LRu1Qyi_JA', name: 'エトラ' },
     { id: 'UCmiYJycZXBGc4s_zjIRUHhQ', name: '春雨 麗女' },
-    { id: 'UC7u_W9WfB_g35m9nK_S460w', name: 'ぷわぷわぽぷら' },
+    { id: 'UC1sBUU-y9FlHNukwsrR4bmA', name: 'ぷわぷわぽぷら' }, // Corrected ID
     { id: 'UCIwHOJn_3QjBTwQ_gNj7WRA', name: '萌実' },
     { id: 'UCxy3KNlLQiN64tikKipnQNg', name: '月赴 ゐぶき' },
     { id: 'UCdi5pj0MDQ-3LFNUFIFmD8w', name: 'うる虎 がーる' },

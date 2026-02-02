@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { getStreams, StreamInfo } from '../src/api/streams';
@@ -8,6 +8,8 @@ import { COLORS } from '../src/constants/theme';
 
 export default function StreamListScreen() {
     const [streams, setStreams] = useState<StreamInfo[]>([]);
+    const [hasMoreArchives, setHasMoreArchives] = useState(false);
+    const [showAllArchives, setShowAllArchives] = useState(false);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
@@ -27,32 +29,39 @@ export default function StreamListScreen() {
                 return isStream && isAllowed;
             });
 
-            // 3. Separate and limit ended streams
+            // Separate Live/Upcoming from Ended
             const liveAndUpcoming = filtered.filter(s => s.status === 'live' || s.status === 'upcoming');
             const ended = filtered.filter(s => s.status === 'ended');
 
-            // Limit ended streams (archives) to avoid clutter, user requested max 10
-            const restrictedEnded = ended.slice(0, 10);
+            setHasMoreArchives(ended.length > 10);
 
-            setStreams([...liveAndUpcoming, ...restrictedEnded]);
+            // If showAllArchives is true, show all. Otherwise show 10.
+            const displayEnded = (showAllArchives || force === true) ? ended : ended.slice(0, 10);
+
+            setStreams([...liveAndUpcoming, ...displayEnded]);
         } catch (error) {
             console.error('Failed to load streams', error);
         } finally {
             setLoading(false);
             setRefreshing(false);
         }
-    }, []);
+    }, [showAllArchives]);
 
-    // Refresh when screen comes into focus (e.g. returning from settings)
-    // using useFocusEffect from expo-router (wraps React Navigation's useFocusEffect)
+    // Refresh when screen comes into focus
     useFocusEffect(
         useCallback(() => {
             loadStreams();
         }, [loadStreams])
     );
 
+    // If showAllArchives changes, reload the list
+    useEffect(() => {
+        loadStreams();
+    }, [showAllArchives]);
+
     const onRefresh = () => {
         setRefreshing(true);
+        setShowAllArchives(false); // Reset on refresh
         loadStreams(true);
     };
 
@@ -83,6 +92,16 @@ export default function StreamListScreen() {
                         progressViewOffset={10}
                     />
                 }
+                ListFooterComponent={
+                    hasMoreArchives && !showAllArchives ? (
+                        <TouchableOpacity
+                            style={styles.moreButton}
+                            onPress={() => setShowAllArchives(true)}
+                        >
+                            <Text style={styles.moreButtonText}>過去の配信をもっと見る</Text>
+                        </TouchableOpacity>
+                    ) : null
+                }
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         <Text style={styles.emptyText}>現在予定されている配信はありません</Text>
@@ -92,7 +111,7 @@ export default function StreamListScreen() {
             {/* Manual Refresh FAB */}
             <TouchableOpacity
                 style={styles.fab}
-                onPress={() => loadStreams(true)}
+                onPress={() => onRefresh()}
                 disabled={loading || refreshing}
             >
                 {refreshing ? (
@@ -127,6 +146,21 @@ const styles = StyleSheet.create({
     emptyText: {
         color: COLORS.textSecondary,
         fontSize: 16,
+    },
+    moreButton: {
+        padding: 16,
+        alignItems: 'center',
+        backgroundColor: COLORS.cardBackground,
+        marginHorizontal: 16,
+        marginVertical: 10,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: COLORS.divider,
+    },
+    moreButtonText: {
+        color: COLORS.primary,
+        fontSize: 14,
+        fontWeight: 'bold',
     },
     fab: {
         position: 'absolute',
