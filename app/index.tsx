@@ -53,6 +53,16 @@ export default function StreamListScreen() {
         }, [loadStreams])
     );
 
+    // Auto-refresh every 10 minutes
+    useEffect(() => {
+        const interval = setInterval(() => {
+            console.log('Auto-refreshing streams...');
+            loadStreams(true);
+        }, 10 * 60 * 1000); // 10 minutes
+
+        return () => clearInterval(interval);
+    }, [loadStreams]);
+
     useEffect(() => {
         const displayEnded = allData.ended.slice(0, visibleCount);
         setStreams([...allData.liveAndUpcoming, ...displayEnded]);
