@@ -19,7 +19,7 @@ const MEMBERS = [
     { id: 'UCxy3KNlLQiN64tikKipnQNg', name: '月赴 ゐぶき' },
     { id: 'UCdi5pj0MDQ-3LFNUFIFmD8w', name: 'うる虎 がーる' },
     { id: 'UCXXlhNCp1EPbDQ2pzmmy9aw', name: '八十科 むじな' },
-    { id: 'UCPLeqi7rIqS5CFl0_5-pkNw', name: 'あおぎり高校 公式' },
+    { id: 'UCPLeqi7rIqS9uY4_TrSUOMg', name: 'あおぎり高校 公式' },
 ];
 
 async function update() {
