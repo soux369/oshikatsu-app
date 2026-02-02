@@ -1,22 +1,24 @@
+require('dotenv').config(); // Load .env locally
 const axios = require('axios');
 const fs = require('fs');
 
-/**
- * BACKGROUND SCRIPT: For GitHub Actions
- * This script fetches data from YouTube and saves it as streams.json.
- */
-
 const API_KEY = process.env.YOUTUBE_API_KEY;
-const GROUP_KEYWORD = 'あおぎり高校';
+
+// Updated Aogiri Members List (Excluding retired members)
 const CHANNEL_IDS = [
-    'UCPG_p9shR2IdjUjvyO03pRA', // 音霊魂子
-    'UC1YvO_6YI8GisE0pT606S-A', // 石狩あかり
-    'UCR_6MvSPrTzG_U_Xv-vX_fA', // 大代真白
-    'UCl_V378ZvT9V6U_f9mS8A-g', // 山黒音玄
-    'UC_8O_uS9_p9x_-w8I8yv8Cg', // 栗駒こまる
-    'UCV_r_p7_S8r-s-S7p9G_v8Q', // 千代浦蝶美
-    'UCM_8O_uS9_p9x_-w8I8yv8Cg', // 我部りあ (Example ID)
-    // ... 他のメンバーのIDを追加
+    'UCt7_srJeiw55kTcK7M9ID6g', // 音霊 魂子
+    'UC7wZb5INldbGweowOhBIs8Q', // 石狩 あかり
+    'UCs-lYkwb-NYKE9_ssTRDK3Q', // 山黒 音玄
+    'UCXXnWssOLdB2jg-4CznteAA', // 栗駒 こまる
+    'UCyY6YeINiwQoA-FnmdQCkug', // 千代浦 蝶美
+    'UCFvEuP2EDkvrgJpHI6-pyNw', // 我部 りえる
+    'UCAHXqn4nAd2j3LRu1Qyi_JA', // エトラ
+    'UCmiYJycZXBGc4s_zjIRUHhQ', // 春雨 麗女
+    'UC7u_W9WfB_g35m9nK_S460w', // ぷわぷわぽぷら
+    'UCIwHOJn_3QjBTwQ_gNj7WRA', // 萌実
+    'UCxy3KNlLQiN64tikKipnQNg', // 月赴 ゐぶき
+    'UCdi5pj0MDQ-3LFNUFIFmD8w', // うる虎 がーる
+    'UCXXlhNCp1EPbDQ2pzmmy9aw', // 八十科 むじな
 ];
 
 async function update() {
@@ -26,28 +28,45 @@ async function update() {
     }
 
     try {
-        const live = await fetchByType('live');
-        const upcoming = await fetchByType('upcoming');
+        console.log('Fetching live streams...');
+        const live = await fetchStreams('live');
+
+        console.log('Fetching upcoming streams...');
+        const upcoming = await fetchStreams('upcoming');
 
         const combined = [...live, ...upcoming];
 
         fs.writeFileSync('streams.json', JSON.stringify(combined, null, 2));
-        console.log(`Updated streams.json with ${combined.length} items`);
+        console.log(`Successfully updated streams.json with ${combined.length} items.`);
     } catch (e) {
-        console.error('Update failed:', e);
+        console.error('Update failed:', e.message);
+        if (e.response) {
+            console.error('Response data:', e.response.data);
+        }
     }
 }
 
-async function fetchByType(eventType) {
+async function fetchStreams(eventType) {
     const url = `https://www.googleapis.com/youtube/v3/search`;
+
+    // API Quota Optimization: 
+    // Instead of string searching "Aogiri", we should ideally filter by channel ID.
+    // However, search endpoint with channelId only accepts ONE channel ID.
+    // So we search for "あおぎり高校" and then filter results client-side by our ID list.
+    // This isn't perfect but saves multiple API calls.
+
+    // Note: To be more robust, we might loop through IDs, but that consumes quota fast.
+    // For now, let's stick to keyword search + filter.
+
     const response = await axios.get(url, {
         params: {
             part: 'snippet',
-            q: GROUP_KEYWORD,
+            q: 'あおぎり高校',
             type: 'video',
             eventType: eventType,
             key: API_KEY,
             maxResults: 50,
+            order: 'date', // Get latest
         }
     });
 
@@ -60,6 +79,7 @@ async function fetchByType(eventType) {
             status: eventType,
             channelTitle: item.snippet.channelTitle,
             channelId: item.snippet.channelId,
+            scheduledStartTime: item.snippet.publishedAt, // approximate for search results
             updatedAt: new Date().toISOString()
         }));
 }

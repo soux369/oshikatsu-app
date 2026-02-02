@@ -5,13 +5,16 @@ import { getLocalCache, saveToLocalCache } from '../services/storage';
 // URL of the auto-updated JSON file. 
 // After pushing to GitHub and enabling GitHub Pages, this will be:
 // https://<YOUR_GITHUB_USERNAME>.github.io/<YOUR_REPO_NAME>/streams.json
-const HOSTED_JSON_URL = 'https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/streams.json';
+const HOSTED_JSON_URL = 'https://raw.githubusercontent.com/soux369/oshikatsu-app/main/streams.json';
+
+// Re-export StreamInfo for consumers
+export { StreamInfo };
 
 /**
  * Main fetcher for the app. 
  * Reads from a hosted JSON file that is updated automatically via GitHub Actions.
  */
-export const getLatestStreams = async (): Promise<StreamInfo[]> => {
+export const getStreams = async (): Promise<StreamInfo[]> => {
     // 1. Try Local Cache first (AsyncStorage)
     const cached = await getLocalCache<StreamInfo[]>();
     if (cached) {
@@ -20,11 +23,6 @@ export const getLatestStreams = async (): Promise<StreamInfo[]> => {
 
     // 2. Fetch from Hosted JSON
     try {
-        if (HOSTED_JSON_URL.includes('YOUR_USERNAME')) {
-            console.warn('Hosted URL is not configured yet.');
-            return [];
-        }
-
         const response = await axios.get<StreamInfo[]>(HOSTED_JSON_URL);
         const data = response.data;
 
@@ -37,3 +35,6 @@ export const getLatestStreams = async (): Promise<StreamInfo[]> => {
         return [];
     }
 };
+
+// Alias for backward compatibility if needed, though we use getStreams now
+export const getLatestStreams = getStreams;

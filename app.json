@@ -1,47 +1,48 @@
 {
-    "expo": {
-        "name": "あおぎり配信通知",
-        "slug": "aogiri-oshikatsu-app",
-        "version": "1.0.0",
-        "orientation": "portrait",
-        "icon": "./assets/icon.png",
-        "userInterfaceStyle": "light",
-        "newArchEnabled": true,
-        "ios": {
-            "supportsTablet": true,
-            "bundleIdentifier": "com.anonymous.aogirioshikatsuapp"
-        },
-        "android": {
-            "adaptiveIcon": {
-                "foregroundImage": "./assets/adaptive-icon.png",
-                "backgroundColor": "#ffffff"
-            },
-            "package": "com.anonymous.aogirioshikatsuapp",
-            "permissions": [
-                "NOTIFICATIONS"
-            ]
-        },
-        "web": {
-            "favicon": "./assets/favicon.png"
-        },
-        "plugins": [
-            "expo-router",
-            [
-                "expo-notifications",
-                {
-                    "icon": "./assets/notification-icon.png",
-                    "color": "#ffffff"
-                }
-            ]
-        ],
-        "scheme": "aogiri-app",
-        "extra": {
-            "router": {
-                "origin": false
-            },
-            "eas": {
-                "projectId": "your-project-id"
-            }
+  "expo": {
+    "name": "あおぎり配信通知",
+    "slug": "aogiri-oshikatsu-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.aogirioshikatsuapp"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.anonymous.aogirioshikatsuapp",
+      "permissions": [
+        "NOTIFICATIONS"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#ffffff"
         }
+      ],
+      "expo-asset"
+    ],
+    "scheme": "aogiri-app",
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "your-project-id"
+      }
     }
+  }
 }

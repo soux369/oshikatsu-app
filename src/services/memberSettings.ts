@@ -6,15 +6,15 @@ const MEMBER_SETTINGS_KEY = 'MEMBER_NOTIF_SETTINGS';
  * Member-specific notification settings
  * key: channelId, value: boolean
  */
-export interface MemberSettings {
+export interface NotificationSettings {
     [channelId: string]: boolean;
 }
 
-export const saveMemberSettings = async (settings: MemberSettings) => {
+export const saveNotificationSettings = async (settings: NotificationSettings) => {
     await AsyncStorage.setItem(MEMBER_SETTINGS_KEY, JSON.stringify(settings));
 };
 
-export const getMemberSettings = async (): Promise<MemberSettings> => {
+export const getNotificationSettings = async (): Promise<NotificationSettings> => {
     const data = await AsyncStorage.getItem(MEMBER_SETTINGS_KEY);
     return data ? JSON.parse(data) : {};
 };
@@ -23,8 +23,8 @@ export const getMemberSettings = async (): Promise<MemberSettings> => {
  * Toggle notification for a specific channel
  */
 export const toggleMemberNotification = async (channelId: string) => {
-    const settings = await getMemberSettings();
+    const settings = await getNotificationSettings();
     settings[channelId] = !settings[channelId];
-    await saveMemberSettings(settings);
+    await saveNotificationSettings(settings);
     return settings[channelId];
 };

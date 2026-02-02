@@ -1,30 +1,59 @@
-import { Tabs } from 'expo-router';
-import { PaperProvider, MD3LightTheme } from 'react-native-paper';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import {
+    createMaterialTopTabNavigator,
+    MaterialTopTabNavigationOptions,
+    MaterialTopTabNavigationEventMap,
+} from '@react-navigation/material-top-tabs';
+import { withLayoutContext } from 'expo-router';
+import { ParamListBase, TabNavigationState } from '@react-navigation/native';
+import { COLORS } from '../src/constants/theme';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
 
-export default function RootLayout() {
+const { Navigator } = createMaterialTopTabNavigator();
+
+export const MaterialTopTabs = withLayoutContext<
+    MaterialTopTabNavigationOptions,
+    typeof Navigator,
+    TabNavigationState<ParamListBase>,
+    MaterialTopTabNavigationEventMap
+>(Navigator);
+
+export default function Layout() {
     return (
-        <PaperProvider theme={MD3LightTheme}>
-            <Tabs screenOptions={{ headerShown: false }}>
-                <Tabs.Screen
-                    name="index"
-                    options={{
-                        title: '配信一覧',
-                        tabBarIcon: ({ color, size }) => (
-                            <MaterialCommunityIcons name="video-live" color={color} size={size} />
-                        ),
+        <SafeAreaProvider>
+            <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.background }} edges={['top']}>
+                <StatusBar style="light" backgroundColor={COLORS.background} />
+                <MaterialTopTabs
+                    screenOptions={{
+                        tabBarStyle: {
+                            backgroundColor: COLORS.background,
+                            borderBottomColor: COLORS.divider,
+                            borderBottomWidth: 1,
+                        },
+                        tabBarLabelStyle: {
+                            fontWeight: 'bold',
+                            textTransform: 'none',
+                            fontSize: 16,
+                        },
+                        tabBarActiveTintColor: COLORS.tabBarActive,
+                        tabBarInactiveTintColor: COLORS.tabBarInactive,
+                        tabBarIndicatorStyle: {
+                            backgroundColor: COLORS.tabBarIndicator,
+                            height: 2,
+                        },
+                        sceneStyle: { backgroundColor: COLORS.background },
                     }}
-                />
-                <Tabs.Screen
-                    name="members"
-                    options={{
-                        title: '設定',
-                        tabBarIcon: ({ color, size }) => (
-                            <MaterialCommunityIcons name="account-group" color={color} size={size} />
-                        ),
-                    }}
-                />
-            </Tabs>
-        </PaperProvider>
+                >
+                    <MaterialTopTabs.Screen
+                        name="index"
+                        options={{ title: '配信リスト' }}
+                    />
+                    <MaterialTopTabs.Screen
+                        name="members"
+                        options={{ title: 'メンバー' }}
+                    />
+                </MaterialTopTabs>
+            </SafeAreaView>
+        </SafeAreaProvider>
     );
 }

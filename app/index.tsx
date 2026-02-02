@@ -1,61 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { FlatList, StyleSheet, View, RefreshControl } from 'react-native';
-import { Appbar, ActivityIndicator, Text } from 'react-native-paper';
-import { StreamCard } from '../src/components/stream/StreamCard';
-import { getLatestStreams } from '../src/api/streams';
-import { StreamInfo } from '../src/types/youtube';
-import { useNotifications } from '../src/hooks/useNotifications';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
+import { getStreams, StreamInfo } from '../src/api/streams';
+import StreamCard from '../src/components/stream/StreamCard';
+import { COLORS } from '../src/constants/theme';
 
-export default function HomeScreen() {
+export default function StreamListScreen() {
     const [streams, setStreams] = useState<StreamInfo[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
-    // Initialize notifications logic
-    useNotifications(streams);
-
-    const loadData = async () => {
-        setLoading(true);
-        const data = await getLatestStreams();
-        setStreams(data);
-        setLoading(false);
-    };
-
-    const onRefresh = async () => {
-        setRefreshing(true);
-        const data = await getLatestStreams();
-        setStreams(data);
-        setRefreshing(false);
-    };
-
-    useEffect(() => {
-        loadData();
+    const loadStreams = useCallback(async () => {
+        try {
+            const data = await getStreams();
+            setStreams(data);
+        } catch (error) {
+            console.error('Failed to load streams', error);
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
     }, []);
 
-    if (loading && streams.length === 0) {
+    useEffect(() => {
+        loadStreams();
+    }, [loadStreams]);
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        loadStreams();
+    };
+
+    if (loading) {
         return (
-            <View style={styles.center}>
-                <ActivityIndicator animating={true} />
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={COLORS.primary} />
             </View>
         );
     }
 
     return (
         <View style={styles.container}>
-            <Appbar.Header>
-                <Appbar.Content title="あおぎり配信通知" />
-            </Appbar.Header>
-
             <FlatList
                 data={streams}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => <StreamCard stream={item} />}
+                contentContainerStyle={styles.listContent}
                 refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />
                 }
                 ListEmptyComponent={
-                    <View style={styles.center}>
-                        <Text>現在、配信予定はありません</Text>
+                    <View style={styles.emptyContainer}>
+                        <Text style={styles.emptyText}>現在予定されている配信はありません</Text>
                     </View>
                 }
             />
@@ -66,12 +61,23 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: COLORS.background,
     },
-    center: {
+    loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
+        backgroundColor: COLORS.background,
+    },
+    listContent: {
+        paddingBottom: 20,
+    },
+    emptyContainer: {
+        padding: 40,
+        alignItems: 'center',
+    },
+    emptyText: {
+        color: COLORS.textSecondary,
+        fontSize: 16,
     },
 });

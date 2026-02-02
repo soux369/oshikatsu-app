@@ -21,3 +21,7 @@ web-build/
 
 # TypeScript
 *.tsbuildinfo
+
+.agent/
+
+.agent/

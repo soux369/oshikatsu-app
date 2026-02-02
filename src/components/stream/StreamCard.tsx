@@ -1,86 +1,92 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Linking } from 'react-native';
-import { Card, Text, Badge, Divider } from 'react-native-paper';
-import { StreamInfo } from '../../types/youtube';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Linking } from 'react-native';
+import { StreamInfo } from '../../api/streams';
 import { getMemberById } from '../../constants/members';
+import { COLORS } from '../../constants/theme'; // Import new theme
 
-interface StreamCardProps {
+interface Props {
     stream: StreamInfo;
 }
 
-export const StreamCard: React.FC<StreamCardProps> = ({ stream }) => {
+export default function StreamCard({ stream }: Props) {
     const member = getMemberById(stream.channelId);
-    const isLive = stream.status === 'live';
 
-    const handlePress = () => {
-        const url = `https://www.youtube.com/watch?v=${stream.id}`;
-        Linking.openURL(url);
+    const openStream = () => {
+        Linking.openURL(`https://www.youtube.com/watch?v=${stream.id}`);
     };
 
-    const startTimeStr = stream.scheduledStartTime
-        ? new Date(stream.scheduledStartTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        : '';
+    // Format date
+    const date = stream.scheduledStartTime ? new Date(stream.scheduledStartTime) : new Date();
+    const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
 
     return (
-        <Card style={styles.card} onPress={handlePress}>
-            <Card.Cover source={{ uri: stream.thumbnailUrl }} style={styles.thumbnail} />
-            <Card.Content style={styles.content}>
-                <View style={styles.header}>
-                    <Text variant="titleMedium" numberOfLines={1} style={styles.title}>
-                        {stream.title}
-                    </Text>
-                    <Badge
-                        style={[styles.badge, { backgroundColor: isLive ? '#ff0000' : '#2196F3' }]}
-                    >
-                        {isLive ? 'LIVE' : 'UPCOMING'}
-                    </Badge>
-                </View>
-                <View style={styles.info}>
-                    <Text variant="bodySmall" style={{ color: member?.color || '#666' }}>
-                        {stream.channelTitle}
-                    </Text>
-                    {!isLive && startTimeStr && (
-                        <Text variant="bodySmall" style={styles.time}>
-                            {startTimeStr} 開始予定
-                        </Text>
+        <TouchableOpacity style={styles.card} onPress={openStream}>
+            <Image source={{ uri: stream.thumbnailUrl }} style={styles.thumbnail} />
+            <View style={styles.infoContainer}>
+                <View style={styles.headerRow}>
+                    {member && (
+                        <View style={[styles.avatarPlaceholder, { backgroundColor: member.color }]}>
+                            <Text style={styles.avatarText}>{member.name[0]}</Text>
+                        </View>
                     )}
+                    <View style={styles.textContainer}>
+                        <Text style={styles.title} numberOfLines={2}>{stream.title}</Text>
+                        <Text style={styles.channelName}>{member?.name || stream.channelId}</Text>
+                        <Text style={styles.time}>{dateStr} • {stream.status === 'live' ? 'LIVE NOW' : 'Upcoming'}</Text>
+                    </View>
                 </View>
-            </Card.Content>
-        </Card>
+            </View>
+        </TouchableOpacity>
     );
-};
+}
 
 const styles = StyleSheet.create({
     card: {
-        marginVertical: 8,
-        marginHorizontal: 16,
-        overflow: 'hidden',
+        backgroundColor: COLORS.cardBackground,
+        marginBottom: 16, // Spacing between cards
+        // Removed shadows for cleaner flat dark UI, typical of YouTube mobile
     },
     thumbnail: {
-        height: 180,
+        width: '100%',
+        aspectRatio: 16 / 9,
     },
-    content: {
-        paddingTop: 8,
+    infoContainer: {
+        padding: 12,
     },
-    header: {
+    headerRow: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+    },
+    avatarPlaceholder: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        justifyContent: 'center',
         alignItems: 'center',
+        marginRight: 10,
+        marginTop: 2,
+    },
+    avatarText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 18,
+    },
+    textContainer: {
+        flex: 1,
     },
     title: {
-        flex: 1,
-        marginRight: 8,
-    },
-    badge: {
-        color: 'white',
+        fontSize: 15,
         fontWeight: 'bold',
+        color: COLORS.textPrimary,
+        marginBottom: 4,
+        lineHeight: 20,
     },
-    info: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 4,
+    channelName: {
+        fontSize: 12,
+        color: COLORS.textSecondary,
+        marginBottom: 2,
     },
     time: {
-        fontFamily: 'monospace',
+        fontSize: 12,
+        color: COLORS.textSecondary,
     },
 });
