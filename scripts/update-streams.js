@@ -33,7 +33,7 @@ async function update() {
         const channelIds = MEMBERS.map(m => m.id);
         const uploadsMap = await fetchUploadsPlaylistIds(channelIds);
 
-        console.log('Fetching latest items from playlists (max 50)...');
+        console.log('Fetching latest items from playlists (max 20)...');
         let allVideoIds = [];
         let fetchedPlaylistsCount = 0;
 
@@ -128,7 +128,7 @@ async function fetchRecentVideosFromPlaylist(playlistId) {
             params: {
                 part: 'snippet,contentDetails',
                 playlistId: playlistId,
-                maxResults: 50,
+                maxResults: 20, // Focus on recent content
                 key: API_KEY,
             }
         });
@@ -147,7 +147,7 @@ async function fetchVideosBySearch(channelId) {
                 channelId: channelId,
                 type: 'video',
                 order: 'date',
-                maxResults: 20,
+                maxResults: 10,
                 key: API_KEY,
             }
         });
