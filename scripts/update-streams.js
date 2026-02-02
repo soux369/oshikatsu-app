@@ -4,7 +4,7 @@ const fs = require('fs');
 
 const API_KEY = process.env.YOUTUBE_API_KEY;
 
-// Updated Aogiri Members List (Excluding retired members)
+// Aogiri Members List (Excluding retired members)
 const CHANNEL_IDS = [
     'UCt7_srJeiw55kTcK7M9ID6g', // 音霊 魂子
     'UC7wZb5INldbGweowOhBIs8Q', // 石狩 あかり
@@ -28,16 +28,27 @@ async function update() {
     }
 
     try {
-        console.log('Fetching live streams...');
-        const live = await fetchStreams('live');
+        console.log('Fetching candidate streams from Search API...');
+        // 1. Get raw candidates from Search API
+        const liveCandidates = await fetchCandidateIds('live');
+        const upcomingCandidates = await fetchCandidateIds('upcoming');
 
-        console.log('Fetching upcoming streams...');
-        const upcoming = await fetchStreams('upcoming');
+        // Deduplicate IDs
+        const allIds = [...new Set([...liveCandidates, ...upcomingCandidates])];
 
-        const combined = [...live, ...upcoming];
+        if (allIds.length === 0) {
+            console.log('No streams found.');
+            fs.writeFileSync('streams.json', JSON.stringify([], null, 2));
+            return;
+        }
 
-        fs.writeFileSync('streams.json', JSON.stringify(combined, null, 2));
-        console.log(`Successfully updated streams.json with ${combined.length} items.`);
+        console.log(`Verifying status for ${allIds.length} videos...`);
+        // 2. Verify accurate status using Videos API
+        const verifiedStreams = await fetchVideoDetails(allIds);
+
+        // 3. Save result
+        fs.writeFileSync('streams.json', JSON.stringify(verifiedStreams, null, 2));
+        console.log(`Successfully updated streams.json with ${verifiedStreams.length} verified items.`);
     } catch (e) {
         console.error('Update failed:', e.message);
         if (e.response) {
@@ -46,42 +57,65 @@ async function update() {
     }
 }
 
-async function fetchStreams(eventType) {
+async function fetchCandidateIds(eventType) {
     const url = `https://www.googleapis.com/youtube/v3/search`;
+    try {
+        const response = await axios.get(url, {
+            params: {
+                part: 'snippet',
+                q: 'あおぎり高校',
+                type: 'video',
+                eventType: eventType,
+                key: API_KEY,
+                maxResults: 50,
+                order: 'date',
+            }
+        });
 
-    // API Quota Optimization: 
-    // Instead of string searching "Aogiri", we should ideally filter by channel ID.
-    // However, search endpoint with channelId only accepts ONE channel ID.
-    // So we search for "あおぎり高校" and then filter results client-side by our ID list.
-    // This isn't perfect but saves multiple API calls.
+        return response.data.items
+            .filter(item => CHANNEL_IDS.includes(item.snippet.channelId))
+            .map(item => item.id.videoId);
+    } catch (error) {
+        console.warn(`Search for ${eventType} failed:`, error.message);
+        return [];
+    }
+}
 
-    // Note: To be more robust, we might loop through IDs, but that consumes quota fast.
-    // For now, let's stick to keyword search + filter.
+async function fetchVideoDetails(videoIds) {
+    const url = `https://www.googleapis.com/youtube/v3/videos`;
+    try {
+        const response = await axios.get(url, {
+            params: {
+                part: 'snippet,liveStreamingDetails',
+                id: videoIds.join(','),
+                key: API_KEY,
+            }
+        });
 
-    const response = await axios.get(url, {
-        params: {
-            part: 'snippet',
-            q: 'あおぎり高校',
-            type: 'video',
-            eventType: eventType,
-            key: API_KEY,
-            maxResults: 50,
-            order: 'date', // Get latest
-        }
-    });
+        return response.data.items.map(item => {
+            const status = item.snippet.liveBroadcastContent; // 'live', 'upcoming', 'none'
 
-    return response.data.items
-        .filter(item => CHANNEL_IDS.includes(item.snippet.channelId))
-        .map(item => ({
-            id: item.id.videoId,
-            title: item.snippet.title,
-            thumbnailUrl: item.snippet.thumbnails.high.url,
-            status: eventType,
-            channelTitle: item.snippet.channelTitle,
-            channelId: item.snippet.channelId,
-            scheduledStartTime: item.snippet.publishedAt, // approximate for search results
-            updatedAt: new Date().toISOString()
-        }));
+            // Filter out finished streams (none)
+            if (status === 'none') return null;
+
+            // Use liveStreamingDetails for more accurate times
+            const startTime = item.liveStreamingDetails?.scheduledStartTime || item.snippet.publishedAt;
+
+            return {
+                id: item.id,
+                title: item.snippet.title,
+                thumbnailUrl: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
+                status: status, // This is the source of truth from Videos API
+                channelTitle: item.snippet.channelTitle,
+                channelId: item.snippet.channelId,
+                scheduledStartTime: startTime,
+                updatedAt: new Date().toISOString()
+            };
+        }).filter(item => item !== null); // Remove nulls
+    } catch (error) {
+        console.error('Video details fetch failed:', error.message);
+        return [];
+    }
 }
 
 update();
