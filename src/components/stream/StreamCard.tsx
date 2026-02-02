@@ -29,9 +29,30 @@ export default function StreamCard({ stream }: Props) {
         return totalSec < 62; // 62s buffer
     }, [stream.duration]);
 
-    // Format date
+    // Format date/time
     const date = stream.scheduledStartTime ? new Date(stream.scheduledStartTime) : new Date();
-    const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+
+    const dateStr = React.useMemo(() => {
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
+        const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+
+        // If it's upcoming or live, show the scheduled/started time
+        if (stream.status !== 'ended') {
+            return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+        }
+
+        // For ended (Archive / Video), show relative time
+        if (diffHrs < 1) {
+            const diffMins = Math.floor(diffMs / (1000 * 60));
+            return `${diffMins || 1}分前`;
+        } else if (diffHrs < 24) {
+            return `${diffHrs}時間前`;
+        } else {
+            const diffDays = Math.floor(diffHrs / 24);
+            return `${diffDays}日前`;
+        }
+    }, [date, stream.status]);
 
     const getStatusBadge = () => {
         if (isShort) {
