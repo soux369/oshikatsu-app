@@ -44,6 +44,14 @@ export default function MemberListScreen() {
                 keyExtractor={(item) => item.id}
                 renderItem={renderItem}
                 contentContainerStyle={styles.listContent}
+                ListHeaderComponent={
+                    <View style={styles.header}>
+                        <Text style={styles.headerTitle}>表示メンバー設定</Text>
+                        <Text style={styles.headerDesc}>
+                            スイッチをONにしたメンバーの配信と動画がリストに表示されます。
+                        </Text>
+                    </View>
+                }
             />
         </View>
     );
@@ -79,5 +87,22 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: COLORS.textPrimary,
         fontWeight: '500',
+    },
+    header: {
+        marginBottom: 20,
+        paddingBottom: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: COLORS.divider,
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: COLORS.textPrimary,
+        marginBottom: 8,
+    },
+    headerDesc: {
+        fontSize: 14,
+        color: COLORS.textSecondary,
+        lineHeight: 20,
     },
 });
