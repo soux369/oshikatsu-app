@@ -22,6 +22,15 @@ const MEMBERS = [
     { id: 'UCPLeqi7rIqS9uY4_TrSUOMg', name: 'あおぎり高校 公式' },
 ];
 
+function parseISO8601Duration(duration) {
+    const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+    if (!match) return 0;
+    const h = parseInt(match[1] || 0);
+    const m = parseInt(match[2] || 0);
+    const s = parseInt(match[3] || 0);
+    return h * 3600 + m * 60 + s;
+}
+
 async function update() {
     if (!API_KEY) {
         console.error('YOUTUBE_API_KEY is missing');
@@ -33,7 +42,7 @@ async function update() {
         const channelIds = MEMBERS.map(m => m.id);
         const uploadsMap = await fetchUploadsPlaylistIds(channelIds);
 
-        console.log('Fetching latest items from playlists (max 20)...');
+        console.log('Fetching latest items from playlists (max 50)...');
         let allVideoIds = [];
         let fetchedPlaylistsCount = 0;
 
@@ -63,7 +72,7 @@ async function update() {
 
         const results = await Promise.all(promises);
         results.forEach(ids => allVideoIds.push(...ids));
-        console.log(`Fetched content from ${fetchedPlaylistsCount}/${MEMBERS.length} channels.`);
+        console.log(`Fetched content IDs from ${fetchedPlaylistsCount}/${MEMBERS.length} channels.`);
 
         // 2. Fetch Upcoming Streams explicitly via Search API
         console.log('Fetching upcoming streams from Search API...');
@@ -79,7 +88,7 @@ async function update() {
             return;
         }
 
-        console.log(`Verifying status for ${allVideoIds.length} videos...`);
+        console.log(`Verifying details for ${allVideoIds.length} videos...`);
         const verifiedItems = await fetchVideoDetails(allVideoIds);
 
         // Sort by Date Newest
@@ -128,7 +137,7 @@ async function fetchRecentVideosFromPlaylist(playlistId) {
             params: {
                 part: 'snippet,contentDetails',
                 playlistId: playlistId,
-                maxResults: 20, // Focus on recent content
+                maxResults: 50, // Increased to 50 to catch more skits/videos
                 key: API_KEY,
             }
         });
@@ -147,7 +156,7 @@ async function fetchVideosBySearch(channelId) {
                 channelId: channelId,
                 type: 'video',
                 order: 'date',
-                maxResults: 10,
+                maxResults: 20,
                 key: API_KEY,
             }
         });
@@ -191,7 +200,7 @@ async function fetchVideoDetails(videoIds) {
             const batchIds = videoIds.slice(i, i + 50);
             const response = await axios.get(url, {
                 params: {
-                    part: 'snippet,liveStreamingDetails',
+                    part: 'snippet,liveStreamingDetails,contentDetails',
                     id: batchIds.join(','),
                     key: API_KEY,
                 }
@@ -200,13 +209,28 @@ async function fetchVideoDetails(videoIds) {
         }
 
         return allItems.map(item => {
-            let status = item.snippet.liveBroadcastContent;
+            let status = item.snippet.liveBroadcastContent; // 'live', 'upcoming', 'none'
             const liveDetails = item.liveStreamingDetails;
+            const contentDetails = item.contentDetails;
 
-            const isStream = !!liveDetails;
-            const type = isStream ? 'stream' : 'video';
+            // Duration-based classification:
+            // Aogiri skits are usually < 15-20 mins. 
+            // Streams are almost always > 30 mins.
+            // Using 25 minutes as the threshold.
+            const durationSec = parseISO8601Duration(contentDetails?.duration || '');
+            const isLongVideo = durationSec > 25 * 60; // 25 mins
 
-            if (isStream) {
+            // If it has live details, it's a candidate for 'stream'
+            let type = liveDetails ? 'stream' : 'video';
+
+            // Exception: Premiered videos/Shorts frequently have liveDetails.
+            // If they are short (< 25 mins), treat them as 'video'.
+            if (type === 'stream' && !isLongVideo && status === 'none') {
+                type = 'video';
+            }
+
+            // Special handling for Ended streams
+            if (liveDetails) {
                 const actualEndTime = liveDetails.actualEndTime;
                 if (actualEndTime || status === 'none') {
                     status = 'ended';
@@ -231,6 +255,7 @@ async function fetchVideoDetails(videoIds) {
                 channelTitle: item.snippet.channelTitle,
                 channelId: item.snippet.channelId,
                 scheduledStartTime: startTime,
+                duration: contentDetails?.duration,
                 updatedAt: new Date().toISOString()
             };
         });
