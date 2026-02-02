@@ -31,20 +31,30 @@ async function update() {
     try {
         console.log('Resolving Uploads Playlist IDs from Channels API...');
         const channelIds = MEMBERS.map(m => m.id);
-        const uploadsIds = await fetchUploadsPlaylistIds(channelIds);
+        const uploadsMap = await fetchUploadsPlaylistIds(channelIds);
 
-        console.log(`Fetching latest videos from ${uploadsIds.length} playlists...`);
+        console.log('Fetching latest videos from playlists...');
         let allVideoIds = [];
+        let fetchedPlaylistsCount = 0;
 
-        // 1. Fetch recent videos/archives from Playlists (Reliable for past content)
-        const playlistPromises = uploadsIds.map(async (playlistId) => {
-            return await fetchRecentVideosFromPlaylist(playlistId);
+        // 1. Fetch recent videos/archives from Playlists
+        const playlistPromises = MEMBERS.map(async (member) => {
+            let playlistId = uploadsMap[member.id];
+            if (!playlistId) {
+                // Fallback: Use UU replacement if API didn't return (or failed)
+                // console.warn(`Fallback to UU for ${member.name}`);
+                playlistId = member.id.replace(/^UC/, 'UU');
+            }
+            const videoIds = await fetchRecentVideosFromPlaylist(playlistId);
+            if (videoIds.length > 0) fetchedPlaylistsCount++;
+            return videoIds;
         });
+
         const playlistResults = await Promise.all(playlistPromises);
         playlistResults.forEach(ids => allVideoIds.push(...ids));
+        console.log(`Fetched from ${fetchedPlaylistsCount}/${MEMBERS.length} playlists.`);
 
-        // 2. Fetch Upcoming Streams explicitly via Search API (Reliable for future content)
-        // Playlists sometimes lag for upcoming streams
+        // 2. Fetch Upcoming Streams explicitly via Search API
         console.log('Fetching upcoming streams from Search API...');
         const upcomingIds = await fetchUpcomingStreams();
         allVideoIds.push(...upcomingIds);
@@ -81,7 +91,6 @@ async function update() {
 async function fetchUploadsPlaylistIds(channelIds) {
     const url = `https://www.googleapis.com/youtube/v3/channels`;
     try {
-        // Channels API allows comma-separated IDs (max 50)
         const response = await axios.get(url, {
             params: {
                 part: 'contentDetails',
@@ -89,10 +98,16 @@ async function fetchUploadsPlaylistIds(channelIds) {
                 key: API_KEY,
             }
         });
-        return response.data.items.map(item => item.contentDetails.relatedPlaylists.uploads);
+
+        // Create Map: ChannelID -> UploadsID
+        const map = {};
+        response.data.items.forEach(item => {
+            map[item.id] = item.contentDetails.relatedPlaylists.uploads;
+        });
+        return map;
     } catch (error) {
         console.error('Channels API failed:', error.message);
-        return [];
+        return {};
     }
 }
 
@@ -103,13 +118,13 @@ async function fetchRecentVideosFromPlaylist(playlistId) {
             params: {
                 part: 'snippet,contentDetails',
                 playlistId: playlistId,
-                maxResults: 10, // Increased to 10 to fetch more videos vs archives
+                maxResults: 10,
                 key: API_KEY,
             }
         });
         return response.data.items.map(item => item.contentDetails.videoId);
     } catch (error) {
-        console.warn(`Failed to fetch playlist ${playlistId}:`, error.message);
+        // console.warn(`Failed to fetch playlist ${playlistId}`);
         return [];
     }
 }
@@ -170,7 +185,6 @@ async function fetchVideoDetails(videoIds) {
                 const startTimeStr = liveDetails.scheduledStartTime || item.snippet.publishedAt;
                 if (status === 'upcoming' && startTimeStr) {
                     const diffHours = (new Date().getTime() - new Date(startTimeStr).getTime()) / (3600 * 1000);
-                    // If > 2 hours overdue, treat as ended/stale
                     if (diffHours > 2) status = 'ended';
                 }
             } else {
