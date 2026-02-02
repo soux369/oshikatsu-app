@@ -30,24 +30,31 @@ async function update() {
 
     try {
         console.log('Fetching candidate streams from Search API...');
-        // 1. Get raw candidates from Search API
-        // Fetch Live & Upcoming
+
+        // 1. Fetch Live & Upcoming (General Search)
+        // General search q="あおぎり高校" sometimes misses specific member streams if they don't have the keyword.
+        // But usually they do.
         const liveCandidates = await fetchCandidateIds('live', 50);
         const upcomingCandidates = await fetchCandidateIds('upcoming', 50);
 
-        // Fetch Recent Archives (completed)
+        // 2. Fetch Recent Archives (General Search)
         const completedCandidates = await fetchCandidateIds('completed', 20);
 
-        // Fetch Uploaded Videos (no eventType) - mainly for official channel videos
-        // We limit this to 20 recent videos
-        const videoCandidates = await fetchCandidateIds(undefined, 20);
+        // 3. Fetch Uploaded Videos (General Search)
+        // Increased to 50 to have a better chance of catching member videos after filtering
+        const videoCandidates = await fetchCandidateIds(undefined, 50);
+
+        // 4. Fetch Official Channel Videos Explicitly
+        // This guarantees we get official channel videos, as general search might dilute them.
+        const officialCandidates = await fetchCandidateIds(undefined, 20, 'UCPLeqi7rIqS5CFl0_5-pkNw');
 
         // Deduplicate IDs
         const allIds = [...new Set([
             ...liveCandidates,
             ...upcomingCandidates,
             ...completedCandidates,
-            ...videoCandidates
+            ...videoCandidates,
+            ...officialCandidates
         ])];
 
         if (allIds.length === 0) {
@@ -61,7 +68,6 @@ async function update() {
         const verifiedItems = await fetchVideoDetails(allIds);
 
         // 3. Sort by Date (Descending - Newest first)
-        // For streams: scheduledStartTime. For videos: publishedAt.
         verifiedItems.sort((a, b) => {
             const timeA = new Date(a.scheduledStartTime || a.publishedAt || 0).getTime();
             const timeB = new Date(b.scheduledStartTime || b.publishedAt || 0).getTime();
@@ -79,7 +85,7 @@ async function update() {
     }
 }
 
-async function fetchCandidateIds(eventType, maxResults) {
+async function fetchCandidateIds(eventType, maxResults, channelId) {
     const url = `https://www.googleapis.com/youtube/v3/search`;
     const params = {
         part: 'snippet',
@@ -92,6 +98,13 @@ async function fetchCandidateIds(eventType, maxResults) {
 
     if (eventType) {
         params.eventType = eventType;
+    }
+
+    if (channelId) {
+        params.channelId = channelId;
+        delete params.q; // If channelId is present, we don't need the keyword essentially, or we keep it? 
+        // Search API with channelId filters by that channel. 'q' would further filter within channel.
+        // We want ALL videos from this channel, so remove 'q'.
     }
 
     try {
@@ -110,18 +123,21 @@ async function fetchVideoDetails(videoIds) {
     const url = `https://www.googleapis.com/youtube/v3/videos`;
     try {
         // Videos API max limit is 50 IDs per request.
-        // Slice first 50.
-        const idsToFetch = videoIds.slice(0, 50);
+        // If > 50, fetch in batches
+        const allItems = [];
+        for (let i = 0; i < videoIds.length; i += 50) {
+            const batchIds = videoIds.slice(i, i + 50);
+            const response = await axios.get(url, {
+                params: {
+                    part: 'snippet,liveStreamingDetails',
+                    id: batchIds.join(','),
+                    key: API_KEY,
+                }
+            });
+            allItems.push(...response.data.items);
+        }
 
-        const response = await axios.get(url, {
-            params: {
-                part: 'snippet,liveStreamingDetails',
-                id: idsToFetch.join(','),
-                key: API_KEY,
-            }
-        });
-
-        return response.data.items.map(item => {
+        return allItems.map(item => {
             let status = item.snippet.liveBroadcastContent; // 'live', 'upcoming', 'none'
             const liveDetails = item.liveStreamingDetails;
 
@@ -143,12 +159,6 @@ async function fetchVideoDetails(videoIds) {
                     if (diffHours > 2) status = 'ended';
                 }
             } else {
-                // For regular videos, status is usually 'none', but we want to display it as a video.
-                // We'll map 'none' to 'uploaded' or just reuse 'ended' or keep 'none'.
-                // Ideally, videos don't have "status" in the same way.
-                // Let's set status to 'ended' just for consistency in filtering, 
-                // OR introduce a new status.
-                // Re-using 'ended' is fine if we differentiate by `type: video`.
                 status = 'ended';
             }
 
