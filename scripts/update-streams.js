@@ -37,22 +37,36 @@ async function update() {
         let allVideoIds = [];
         let fetchedPlaylistsCount = 0;
 
-        // 1. Fetch recent videos/archives from Playlists
-        const playlistPromises = MEMBERS.map(async (member) => {
+        // 1. Fetch recent videos/archives
+        const promises = MEMBERS.map(async (member) => {
             let playlistId = uploadsMap[member.id];
-            if (!playlistId) {
-                playlistId = member.id.replace(/^UC/, 'UU');
+            let videoIds = [];
+
+            // Try Playlist Fetch first
+            if (playlistId) {
+                videoIds = await fetchRecentVideosFromPlaylist(playlistId);
+            } else {
+                // If map failed, try standard UU replacement
+                const fallbackPlaylistId = member.id.replace(/^UC/, 'UU');
+                videoIds = await fetchRecentVideosFromPlaylist(fallbackPlaylistId);
             }
-            const videoIds = await fetchRecentVideosFromPlaylist(playlistId);
+
+            // If Playlist failed (empty), try Force Search for this channel
+            // This is crucial for Official Channel or restricted playlists
+            if (videoIds.length === 0) {
+                console.log(`Playlist fetch failed for ${member.name}, trying Search API...`);
+                videoIds = await fetchVideosBySearch(member.id);
+            }
+
             if (videoIds.length > 0) fetchedPlaylistsCount++;
             return videoIds;
         });
 
-        const playlistResults = await Promise.all(playlistPromises);
-        playlistResults.forEach(ids => allVideoIds.push(...ids));
-        console.log(`Fetched from ${fetchedPlaylistsCount}/${MEMBERS.length} playlists.`);
+        const results = await Promise.all(promises);
+        results.forEach(ids => allVideoIds.push(...ids));
+        console.log(`Fetched content from ${fetchedPlaylistsCount}/${MEMBERS.length} channels.`);
 
-        // 2. Fetch Upcoming Streams explicitly via Search API
+        // 2. Fetch Upcoming Streams explicitly via Search API (Global search for upcoming)
         console.log('Fetching upcoming streams from Search API...');
         const upcomingIds = await fetchUpcomingStreams();
         allVideoIds.push(...upcomingIds);
@@ -115,12 +129,34 @@ async function fetchRecentVideosFromPlaylist(playlistId) {
             params: {
                 part: 'snippet,contentDetails',
                 playlistId: playlistId,
-                maxResults: 20, // Increased to 20 to find more videos hidden behind streams
+                maxResults: 20,
                 key: API_KEY,
             }
         });
         return response.data.items.map(item => item.contentDetails.videoId);
     } catch (error) {
+        // console.warn(`Failed to fetch playlist ${playlistId}:`, error.message);
+        return [];
+    }
+}
+
+// Fallback: Fetch videos using Search API for a specific channel
+async function fetchVideosBySearch(channelId) {
+    const url = `https://www.googleapis.com/youtube/v3/search`;
+    try {
+        const response = await axios.get(url, {
+            params: {
+                part: 'snippet',
+                channelId: channelId,
+                type: 'video',
+                order: 'date',
+                maxResults: 10, // Limit because search is expensive (100 units)
+                key: API_KEY,
+            }
+        });
+        return response.data.items.map(item => item.id.videoId);
+    } catch (error) {
+        console.warn(`Search fallback failed for ${channelId}:`, error.message);
         return [];
     }
 }
