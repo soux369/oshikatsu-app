@@ -19,6 +19,10 @@ export default function VideoListScreen() {
 
     const loadVideos = useCallback(async (force = false) => {
         try {
+            if (!force && videos.length === 0) {
+                setLoading(true);
+            }
+
             const [data, settings] = await Promise.all([
                 getStreams(force),
                 getMemberSettings()
@@ -38,17 +42,13 @@ export default function VideoListScreen() {
             });
 
             setAllVideos(filtered);
-
-            if (force) {
-                setVisibleCount(6);
-            }
         } catch (error) {
             console.error('Failed to load videos', error);
         } finally {
             setLoading(false);
             setRefreshing(false);
         }
-    }, []);
+    }, [videos.length]);
 
     useFocusEffect(
         useCallback(() => {
@@ -56,12 +56,12 @@ export default function VideoListScreen() {
         }, [loadVideos])
     );
 
-    // Auto-refresh every 10 minutes
+    // Auto-refresh every 10 minutes (Silent refresh)
     useEffect(() => {
         const interval = setInterval(() => {
             console.log('Auto-refreshing videos...');
             loadVideos(true);
-        }, 10 * 60 * 1000); // 10 minutes
+        }, 10 * 60 * 1000);
 
         return () => clearInterval(interval);
     }, [loadVideos]);
@@ -83,10 +83,11 @@ export default function VideoListScreen() {
         } else {
             spinAnim.setValue(0);
         }
-    }, [refreshing]);
+    }, [refreshing, spinAnim]);
 
     const onRefresh = () => {
         setRefreshing(true);
+        setVisibleCount(6);
         loadVideos(true);
     };
 
@@ -117,7 +118,7 @@ export default function VideoListScreen() {
         extrapolate: 'clamp',
     });
 
-    if (loading) {
+    if (loading && videos.length === 0) {
         return (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color={COLORS.primary} />
@@ -183,17 +184,6 @@ export default function VideoListScreen() {
                     </View>
                 }
             />
-            <TouchableOpacity
-                style={styles.fab}
-                onPress={onRefresh}
-                disabled={loading || refreshing}
-            >
-                {refreshing ? (
-                    <ActivityIndicator color="white" />
-                ) : (
-                    <Text style={styles.fabText}>↻</Text>
-                )}
-            </TouchableOpacity>
         </View>
     );
 }
@@ -242,28 +232,6 @@ const styles = StyleSheet.create({
     moreButtonText: {
         color: '#eee',
         fontSize: 14,
-        fontWeight: 'bold',
-    },
-    fab: {
-        position: 'absolute',
-        right: 20,
-        bottom: 30,
-        width: 56,
-        height: 56,
-        borderRadius: 28,
-        backgroundColor: COLORS.primary,
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 6,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-        zIndex: 1000,
-    },
-    fabText: {
-        color: 'white',
-        fontSize: 24,
         fontWeight: 'bold',
     },
 });

@@ -19,6 +19,11 @@ export default function StreamListScreen() {
 
     const loadStreams = useCallback(async (force = false) => {
         try {
+            // If it's a silent/auto refresh, don't set loading to true to prevent screen clearing
+            if (!force && streams.length === 0) {
+                setLoading(true);
+            }
+
             const [data, settings] = await Promise.all([
                 getStreams(force),
                 getMemberSettings()
@@ -36,16 +41,15 @@ export default function StreamListScreen() {
 
             setAllData({ liveAndUpcoming, ended });
 
-            if (force) {
-                setVisibleCount(6);
-            }
+            // Only reset visible count if it's a manual pull-to-refresh
+            // (We keep previous visibility during auto-refresh to avoid jumps)
         } catch (error) {
             console.error('Failed to load streams', error);
         } finally {
             setLoading(false);
             setRefreshing(false);
         }
-    }, []);
+    }, [streams.length]);
 
     useFocusEffect(
         useCallback(() => {
@@ -53,12 +57,12 @@ export default function StreamListScreen() {
         }, [loadStreams])
     );
 
-    // Auto-refresh every 10 minutes
+    // Auto-refresh every 10 minutes (Silent refresh)
     useEffect(() => {
         const interval = setInterval(() => {
             console.log('Auto-refreshing streams...');
-            loadStreams(true);
-        }, 10 * 60 * 1000); // 10 minutes
+            loadStreams(true); // Fetches new data but doesn't trigger 'loading' state
+        }, 10 * 60 * 1000);
 
         return () => clearInterval(interval);
     }, [loadStreams]);
@@ -81,10 +85,12 @@ export default function StreamListScreen() {
         } else {
             spinAnim.setValue(0);
         }
-    }, [refreshing]);
+    }, [refreshing, spinAnim]);
 
     const onRefresh = () => {
         setRefreshing(true);
+        // Force refresh AND reset count for manual pull
+        setVisibleCount(6);
         loadStreams(true);
     };
 
@@ -115,7 +121,8 @@ export default function StreamListScreen() {
         extrapolate: 'clamp',
     });
 
-    if (loading) {
+    // Initial full screen loading only
+    if (loading && streams.length === 0) {
         return (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color={COLORS.primary} />
@@ -127,7 +134,6 @@ export default function StreamListScreen() {
 
     return (
         <View style={styles.container}>
-            {/* The indicator is placed first in the JSX, so it's behind the FlatList content */}
             <Animated.View style={[
                 styles.pullIndicator,
                 {
@@ -145,7 +151,6 @@ export default function StreamListScreen() {
                 data={streams}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => <StreamCard stream={item} />}
-                // We add a background color to the list content so it covers the indicator behind it
                 contentContainerStyle={[
                     styles.listContent,
                     { backgroundColor: COLORS.background }
@@ -183,17 +188,6 @@ export default function StreamListScreen() {
                     </View>
                 }
             />
-            <TouchableOpacity
-                style={styles.fab}
-                onPress={onRefresh}
-                disabled={loading || refreshing}
-            >
-                {refreshing ? (
-                    <ActivityIndicator color="white" />
-                ) : (
-                    <Text style={styles.fabText}>↻</Text>
-                )}
-            </TouchableOpacity>
         </View>
     );
 }
@@ -215,7 +209,6 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         alignItems: 'center',
-        // No zIndex here, standard draw order will put it behind the FlatList
     },
     listContent: {
         paddingTop: 12,
@@ -243,28 +236,6 @@ const styles = StyleSheet.create({
     moreButtonText: {
         color: '#eee',
         fontSize: 14,
-        fontWeight: 'bold',
-    },
-    fab: {
-        position: 'absolute',
-        right: 20,
-        bottom: 30,
-        width: 56,
-        height: 56,
-        borderRadius: 28,
-        backgroundColor: COLORS.primary,
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 6,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-        zIndex: 1000,
-    },
-    fabText: {
-        color: 'white',
-        fontSize: 24,
         fontWeight: 'bold',
     },
 });
