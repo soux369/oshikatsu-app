@@ -32,7 +32,9 @@ export default function StreamCard({ stream }: Props) {
                     <View style={styles.textContainer}>
                         <Text style={styles.title} numberOfLines={2}>{stream.title}</Text>
                         <Text style={styles.channelName}>{member?.name || stream.channelId}</Text>
-                        <Text style={styles.time}>{dateStr} • {stream.status === 'live' ? 'LIVE NOW' : 'Upcoming'}</Text>
+                        <Text style={styles.time}>
+                            {dateStr} • {stream.status === 'live' ? 'LIVE NOW' : stream.status === 'ended' ? 'ENDED' : 'Upcoming'}
+                        </Text>
                     </View>
                 </View>
             </View>

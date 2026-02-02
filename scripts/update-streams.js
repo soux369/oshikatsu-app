@@ -109,7 +109,10 @@ async function fetchVideoDetails(videoIds) {
         });
 
         return response.data.items.map(item => {
-            const status = item.snippet.liveBroadcastContent; // 'live', 'upcoming', 'none'
+            let status = item.snippet.liveBroadcastContent; // 'live', 'upcoming', 'none'
+            if (status === 'none') {
+                status = 'ended';
+            }
 
             // Allow 'none' (finished streams) now. No filtering.
 
