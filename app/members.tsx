@@ -46,9 +46,9 @@ export default function MemberListScreen() {
                 contentContainerStyle={styles.listContent}
                 ListHeaderComponent={
                     <View style={styles.header}>
-                        <Text style={styles.headerTitle}>表示メンバー設定</Text>
+                        <Text style={styles.headerTitle}>表示・通知設定</Text>
                         <Text style={styles.headerDesc}>
-                            スイッチをONにしたメンバーの配信と動画がリストに表示されます。
+                            スイッチをONにすると、リストへの表示とライブ開始通知が有効になります。
                         </Text>
                     </View>
                 }
