@@ -110,8 +110,22 @@ async function fetchVideoDetails(videoIds) {
 
         return response.data.items.map(item => {
             let status = item.snippet.liveBroadcastContent; // 'live', 'upcoming', 'none'
-            if (status === 'none') {
+            const actualEndTime = item.liveStreamingDetails?.actualEndTime;
+            // If actualEndTime exists, the stream has definitely ended, regardless of what snippet says
+            if (actualEndTime || status === 'none') {
                 status = 'ended';
+            }
+
+            // Fail-safe: If status is still 'upcoming' but scheduled time was > 2 hours ago, treat as ended.
+            // (e.g. cancelled streams or API lag)
+            const startTimeStr = item.liveStreamingDetails?.scheduledStartTime || item.snippet.publishedAt;
+            if (status === 'upcoming' && startTimeStr) {
+                const startTime = new Date(startTimeStr).getTime();
+                const now = new Date().getTime();
+                const diffHours = (now - startTime) / (1000 * 60 * 60);
+                if (diffHours > 2) {
+                    status = 'ended';
+                }
             }
 
             // Allow 'none' (finished streams) now. No filtering.
