@@ -103,7 +103,7 @@ async function fetchRecentVideosFromPlaylist(playlistId) {
             params: {
                 part: 'snippet,contentDetails',
                 playlistId: playlistId,
-                maxResults: 5, // Get latest 5
+                maxResults: 10, // Increased to 10 to fetch more videos vs archives
                 key: API_KEY,
             }
         });

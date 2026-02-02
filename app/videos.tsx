@@ -1,6 +1,8 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 import { getStreams, StreamInfo } from '../src/api/streams';
+import { getNotificationSettings } from '../src/services/memberSettings';
 import StreamCard from '../src/components/stream/StreamCard';
 import { COLORS } from '../src/constants/theme';
 
@@ -11,8 +13,18 @@ export default function VideoListScreen() {
 
     const loadVideos = useCallback(async (force = false) => {
         try {
-            const data = await getStreams(force);
-            setVideos(data.filter(s => s.type === 'video'));
+            const [data, settings] = await Promise.all([
+                getStreams(force),
+                getNotificationSettings()
+            ]);
+
+            const filtered = data.filter(s => {
+                const isVideo = s.type === 'video';
+                const isAllowed = settings[s.channelId] !== false; // Default ON
+                return isVideo && isAllowed;
+            });
+
+            setVideos(filtered);
         } catch (error) {
             console.error('Failed to load videos', error);
         } finally {
@@ -21,9 +33,11 @@ export default function VideoListScreen() {
         }
     }, []);
 
-    useEffect(() => {
-        loadVideos(); // Initial load
-    }, [loadVideos]);
+    useFocusEffect(
+        useCallback(() => {
+            loadVideos();
+        }, [loadVideos])
+    );
 
     const onRefresh = () => {
         setRefreshing(true);

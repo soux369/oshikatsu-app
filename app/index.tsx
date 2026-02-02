@@ -1,6 +1,8 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 import { getStreams, StreamInfo } from '../src/api/streams';
+import { getNotificationSettings } from '../src/services/memberSettings';
 import StreamCard from '../src/components/stream/StreamCard';
 import { COLORS } from '../src/constants/theme';
 
@@ -11,8 +13,21 @@ export default function StreamListScreen() {
 
     const loadStreams = useCallback(async (force = false) => {
         try {
-            const data = await getStreams(force);
-            setStreams(data.filter(s => s.type === 'stream'));
+            const [data, settings] = await Promise.all([
+                getStreams(force),
+                getNotificationSettings()
+            ]);
+
+            // Filter logic:
+            // 1. Filter by type 'stream' (or missing type for backward compat)
+            // 2. Filter by member settings
+            const filtered = data.filter(s => {
+                const isStream = s.type === 'stream' || !s.type;
+                const isAllowed = settings[s.channelId] !== false; // Default ON
+                return isStream && isAllowed;
+            });
+
+            setStreams(filtered);
         } catch (error) {
             console.error('Failed to load streams', error);
         } finally {
@@ -21,13 +36,17 @@ export default function StreamListScreen() {
         }
     }, []);
 
-    useEffect(() => {
-        loadStreams(); // Initial load (uses cache if available)
-    }, [loadStreams]);
+    // Refresh when screen comes into focus (e.g. returning from settings)
+    // using useFocusEffect from expo-router (wraps React Navigation's useFocusEffect)
+    useFocusEffect(
+        useCallback(() => {
+            loadStreams();
+        }, [loadStreams])
+    );
 
     const onRefresh = () => {
         setRefreshing(true);
-        loadStreams(true); // Force refresh (bypasses cache)
+        loadStreams(true);
     };
 
     if (loading) {
