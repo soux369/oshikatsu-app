@@ -31,7 +31,6 @@ export default function VideoListScreen() {
                 return isVideo && isAllowed;
             });
 
-            // Ensure sorted by date (newest first)
             filtered.sort((a, b) => {
                 const timeA = new Date(a.scheduledStartTime || 0).getTime();
                 const timeB = new Date(b.scheduledStartTime || 0).getTime();
@@ -61,7 +60,6 @@ export default function VideoListScreen() {
         setVideos(allVideos.slice(0, visibleCount));
     }, [allVideos, visibleCount]);
 
-    // Constant spinning during refresh
     useEffect(() => {
         if (refreshing) {
             Animated.loop(
@@ -86,7 +84,6 @@ export default function VideoListScreen() {
         setVisibleCount(prev => prev + 10);
     };
 
-    // Animation values for the pull-down indicator
     const pullIconRotate = scrollY.interpolate({
         inputRange: [-100, 0],
         outputRange: ['180deg', '0deg'],
@@ -139,39 +136,42 @@ export default function VideoListScreen() {
                 data={videos}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => <StreamCard stream={item} />}
-                contentContainerStyle={styles.listContent}
+                contentContainerStyle={[
+                    styles.listContent,
+                    { backgroundColor: COLORS.background }
+                ]}
                 onScroll={Animated.event(
                     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
                     { useNativeDriver: true }
                 )}
-                scrollEventThrottle={16}
-                refreshControl={
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                        tintColor="transparent"
-                        colors={['transparent']}
-                        progressBackgroundColor="transparent"
-                    />
-                }
-                ListFooterComponent={
-                    hasMore ? (
-                        <TouchableOpacity
-                            style={styles.moreButton}
-                            onPress={loadMore}
-                            activeOpacity={0.8}
-                        >
-                            <Text style={styles.moreButtonText}>さらに10件表示</Text>
-                        </TouchableOpacity>
-                    ) : (
-                        allVideos.length > 0 ? <View style={{ height: 40 }} /> : null
-                    )
-                }
-                ListEmptyComponent={
-                    <View style={styles.emptyContainer}>
-                        <Text style={styles.emptyText}>動画が見つかりませんでした</Text>
-                    </View>
-                }
+                scrollEventThrottle: 16,
+            refreshControl: (
+            <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor="transparent"
+                colors={['transparent']}
+                progressBackgroundColor="transparent"
+            />
+            ),
+            ListFooterComponent={
+                hasMore ? (
+                    <TouchableOpacity
+                        style={styles.moreButton}
+                        onPress={loadMore}
+                        activeOpacity={0.8}
+                    >
+                        <Text style={styles.moreButtonText}>さらに10件表示</Text>
+                    </TouchableOpacity>
+                ) : (
+                    allVideos.length > 0 ? <View style={{ height: 40 }} /> : null
+                )
+            }
+            ListEmptyComponent={
+                <View style={styles.emptyContainer}>
+                    <Text style={styles.emptyText}>動画が見つかりませんでした</Text>
+                </View>
+            }
             />
             <TouchableOpacity
                 style={styles.fab}
@@ -201,11 +201,10 @@ const styles = StyleSheet.create({
     },
     pullIndicator: {
         position: 'absolute',
-        top: 30,
+        top: 35,
         left: 0,
         right: 0,
         alignItems: 'center',
-        zIndex: 10,
     },
     listContent: {
         paddingTop: 12,

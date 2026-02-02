@@ -58,7 +58,6 @@ export default function StreamListScreen() {
         setStreams([...allData.liveAndUpcoming, ...displayEnded]);
     }, [allData, visibleCount]);
 
-    // Constant spinning during refresh
     useEffect(() => {
         if (refreshing) {
             Animated.loop(
@@ -83,7 +82,6 @@ export default function StreamListScreen() {
         setVisibleCount(prev => prev + 10);
     };
 
-    // Animation values for the pull-down indicator
     const pullIconRotate = scrollY.interpolate({
         inputRange: [-100, 0],
         outputRange: ['180deg', '0deg'],
@@ -119,7 +117,7 @@ export default function StreamListScreen() {
 
     return (
         <View style={styles.container}>
-            {/* Custom Pull Indicator - Now Dark Colored (#222) and stays during refreshing */}
+            {/* The indicator is placed first in the JSX, so it's behind the FlatList content */}
             <Animated.View style={[
                 styles.pullIndicator,
                 {
@@ -137,7 +135,11 @@ export default function StreamListScreen() {
                 data={streams}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => <StreamCard stream={item} />}
-                contentContainerStyle={styles.listContent}
+                // We add a background color to the list content so it covers the indicator behind it
+                contentContainerStyle={[
+                    styles.listContent,
+                    { backgroundColor: COLORS.background }
+                ]}
                 onScroll={Animated.event(
                     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
                     { useNativeDriver: true }
@@ -147,10 +149,9 @@ export default function StreamListScreen() {
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                        tintColor="transparent" // Hide default spinner on iOS
-                        colors={['transparent']} // Hide default spinner on Android
-                        progressBackgroundColor="transparent" // Fix "black mark" background
-                        style={{ backgroundColor: 'transparent' }}
+                        tintColor="transparent"
+                        colors={['transparent']}
+                        progressBackgroundColor="transparent"
                     />
                 }
                 ListFooterComponent={
@@ -200,11 +201,11 @@ const styles = StyleSheet.create({
     },
     pullIndicator: {
         position: 'absolute',
-        top: 30, // Slightly lower for visibility
+        top: 35,
         left: 0,
         right: 0,
         alignItems: 'center',
-        zIndex: 10, // Ensure it's above other things if needed, though usually zIndex 0 is fine with flatlist transparency
+        // No zIndex here, standard draw order will put it behind the FlatList
     },
     listContent: {
         paddingTop: 12,
