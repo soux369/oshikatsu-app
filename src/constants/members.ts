@@ -18,6 +18,7 @@ export const AOGIRI_MEMBERS: Member[] = [
     { id: 'UCxy3KNlLQiN64tikKipnQNg', name: '月赴 ゐぶき', color: '#800000' }, // Maroon
     { id: 'UCdi5pj0MDQ-3LFNUFIFmD8w', name: 'うる虎 がーる', color: '#ffaa00' }, // Tiger Orange
     { id: 'UCXXlhNCp1EPbDQ2pzmmy9aw', name: '八十科 むじな', color: '#000080' }, // Navy
+    { id: 'UCPLeqi7rIqS5CFl0_5-pkNw', name: 'あおぎり高校 公式', color: '#2b2b2b' }, // Official
 ];
 
 export const getMemberById = (id: string) => AOGIRI_MEMBERS.find(m => m.id === id);

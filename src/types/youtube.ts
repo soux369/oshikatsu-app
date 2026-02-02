@@ -39,6 +39,7 @@ export interface StreamInfo {
     thumbnailUrl: string;
     scheduledStartTime?: string; // ISO 8601 string
     status: 'live' | 'upcoming' | 'ended';
+    type: 'stream' | 'video';
     channelTitle: string;
     channelId: string;
 }

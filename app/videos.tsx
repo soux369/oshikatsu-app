@@ -4,17 +4,17 @@ import { getStreams, StreamInfo } from '../src/api/streams';
 import StreamCard from '../src/components/stream/StreamCard';
 import { COLORS } from '../src/constants/theme';
 
-export default function StreamListScreen() {
-    const [streams, setStreams] = useState<StreamInfo[]>([]);
+export default function VideoListScreen() {
+    const [videos, setVideos] = useState<StreamInfo[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
-    const loadStreams = useCallback(async (force = false) => {
+    const loadVideos = useCallback(async (force = false) => {
         try {
             const data = await getStreams(force);
-            setStreams(data.filter(s => s.type === 'stream'));
+            setVideos(data.filter(s => s.type === 'video'));
         } catch (error) {
-            console.error('Failed to load streams', error);
+            console.error('Failed to load videos', error);
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -22,12 +22,12 @@ export default function StreamListScreen() {
     }, []);
 
     useEffect(() => {
-        loadStreams(); // Initial load (uses cache if available)
-    }, [loadStreams]);
+        loadVideos(); // Initial load
+    }, [loadVideos]);
 
     const onRefresh = () => {
         setRefreshing(true);
-        loadStreams(true); // Force refresh (bypasses cache)
+        loadVideos(true);
     };
 
     if (loading) {
@@ -41,7 +41,7 @@ export default function StreamListScreen() {
     return (
         <View style={styles.container}>
             <FlatList
-                data={streams}
+                data={videos}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => <StreamCard stream={item} />}
                 contentContainerStyle={styles.listContent}
@@ -50,7 +50,7 @@ export default function StreamListScreen() {
                         refreshing={refreshing}
                         onRefresh={onRefresh}
                         tintColor={COLORS.primary}
-                        title="最新情報を取得中..."
+                        title="動画情報を取得中..."
                         titleColor={COLORS.textSecondary}
                         colors={[COLORS.primary]}
                         progressBackgroundColor={COLORS.cardBackground}
@@ -59,14 +59,14 @@ export default function StreamListScreen() {
                 }
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
-                        <Text style={styles.emptyText}>現在予定されている配信はありません</Text>
+                        <Text style={styles.emptyText}>現在新しい動画はありません</Text>
                     </View>
                 }
             />
             {/* Manual Refresh FAB */}
             <TouchableOpacity
                 style={styles.fab}
-                onPress={() => loadStreams(true)}
+                onPress={() => loadVideos(true)}
                 disabled={loading || refreshing}
             >
                 {refreshing ? (

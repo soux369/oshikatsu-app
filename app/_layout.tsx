@@ -49,6 +49,10 @@ export default function Layout() {
                         options={{ title: '配信リスト' }}
                     />
                     <MaterialTopTabs.Screen
+                        name="videos"
+                        options={{ title: '動画' }}
+                    />
+                    <MaterialTopTabs.Screen
                         name="members"
                         options={{ title: 'メンバー' }}
                     />
