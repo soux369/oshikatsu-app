@@ -30,11 +30,14 @@ async function update() {
     try {
         console.log('Fetching candidate streams from Search API...');
         // 1. Get raw candidates from Search API
-        const liveCandidates = await fetchCandidateIds('live');
-        const upcomingCandidates = await fetchCandidateIds('upcoming');
+        // Fetch Live & Upcoming (Limit 50 each)
+        const liveCandidates = await fetchCandidateIds('live', 50);
+        const upcomingCandidates = await fetchCandidateIds('upcoming', 50);
+        // Fetch Recent Archives (Limit 20 to save quota)
+        const completedCandidates = await fetchCandidateIds('completed', 20);
 
         // Deduplicate IDs
-        const allIds = [...new Set([...liveCandidates, ...upcomingCandidates])];
+        const allIds = [...new Set([...liveCandidates, ...upcomingCandidates, ...completedCandidates])];
 
         if (allIds.length === 0) {
             console.log('No streams found.');
@@ -45,6 +48,13 @@ async function update() {
         console.log(`Verifying status for ${allIds.length} videos...`);
         // 2. Verify accurate status using Videos API
         const verifiedStreams = await fetchVideoDetails(allIds);
+
+        // 3. Sort by Scheduled Start Time (Descending - Newest first)
+        verifiedStreams.sort((a, b) => {
+            const timeA = new Date(a.scheduledStartTime || 0).getTime();
+            const timeB = new Date(b.scheduledStartTime || 0).getTime();
+            return timeB - timeA;
+        });
 
         // 3. Save result
         fs.writeFileSync('streams.json', JSON.stringify(verifiedStreams, null, 2));
@@ -57,7 +67,7 @@ async function update() {
     }
 }
 
-async function fetchCandidateIds(eventType) {
+async function fetchCandidateIds(eventType, maxResults) {
     const url = `https://www.googleapis.com/youtube/v3/search`;
     try {
         const response = await axios.get(url, {
@@ -67,7 +77,7 @@ async function fetchCandidateIds(eventType) {
                 type: 'video',
                 eventType: eventType,
                 key: API_KEY,
-                maxResults: 50,
+                maxResults: maxResults,
                 order: 'date',
             }
         });
@@ -84,10 +94,16 @@ async function fetchCandidateIds(eventType) {
 async function fetchVideoDetails(videoIds) {
     const url = `https://www.googleapis.com/youtube/v3/videos`;
     try {
+        // Videos API max limit is 50 IDs per request.
+        // If we have more than 50, we need to batch.
+        // For simplicity now, let's just slice first 50. 
+        // (Aogiri members are few, unlikely to have >50 active/recent streams at once mostly)
+        const idsToFetch = videoIds.slice(0, 50);
+
         const response = await axios.get(url, {
             params: {
                 part: 'snippet,liveStreamingDetails',
-                id: videoIds.join(','),
+                id: idsToFetch.join(','),
                 key: API_KEY,
             }
         });
@@ -95,8 +111,7 @@ async function fetchVideoDetails(videoIds) {
         return response.data.items.map(item => {
             const status = item.snippet.liveBroadcastContent; // 'live', 'upcoming', 'none'
 
-            // Filter out finished streams (none)
-            if (status === 'none') return null;
+            // Allow 'none' (finished streams) now. No filtering.
 
             // Use liveStreamingDetails for more accurate times
             const startTime = item.liveStreamingDetails?.scheduledStartTime || item.snippet.publishedAt;
@@ -105,13 +120,13 @@ async function fetchVideoDetails(videoIds) {
                 id: item.id,
                 title: item.snippet.title,
                 thumbnailUrl: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
-                status: status, // This is the source of truth from Videos API
+                status: status,
                 channelTitle: item.snippet.channelTitle,
                 channelId: item.snippet.channelId,
                 scheduledStartTime: startTime,
                 updatedAt: new Date().toISOString()
             };
-        }).filter(item => item !== null); // Remove nulls
+        });
     } catch (error) {
         console.error('Video details fetch failed:', error.message);
         return [];
