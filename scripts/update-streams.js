@@ -79,7 +79,7 @@ async function update() {
         const upcomingIds = await fetchUpcomingStreams();
         allVideoIds.push(...upcomingIds);
 
-        // Deduplicate
+        // Deduplicate IDs
         allVideoIds = [...new Set(allVideoIds)];
 
         if (allVideoIds.length === 0) {
@@ -89,17 +89,42 @@ async function update() {
         }
 
         console.log(`Verifying details for ${allVideoIds.length} videos...`);
-        const verifiedItems = await fetchVideoDetails(allVideoIds);
+        let verifiedItems = await fetchVideoDetails(allVideoIds);
+
+        // --- ENHANCED DEDUPLICATION ---
+        // Some members have duplicate titles for different IDs (e.g., short placeholder + actual Archive)
+        // Or multiple search results for the same event.
+        const sortedByQuality = verifiedItems.sort((a, b) => {
+            // Prefer items with duration > 0
+            const durA = parseISO8601Duration(a.duration || '');
+            const durB = parseISO8601Duration(b.duration || '');
+            return durB - durA;
+        });
+
+        const uniqueItemsMap = new Map();
+        for (const item of sortedByQuality) {
+            // Key by title + channelId to catch same-stream duplicates with different IDs
+            const key = `${item.channelId}_${item.title.trim()}`;
+            if (!uniqueItemsMap.has(key)) {
+                uniqueItemsMap.set(key, item);
+            } else {
+                // If we already have it, check if the new one is 'upcoming' while the stored is 'ended'
+                // Or if the stored one has 0 duration and this one doesn't.
+                // Since we sorted by duration Desc, the first one is usually the better one.
+            }
+        }
+
+        let finalItems = Array.from(uniqueItemsMap.values());
 
         // Sort by Date Newest
-        verifiedItems.sort((a, b) => {
+        finalItems.sort((a, b) => {
             const timeA = new Date(a.scheduledStartTime || a.publishedAt || 0).getTime();
             const timeB = new Date(b.scheduledStartTime || b.publishedAt || 0).getTime();
             return timeB - timeA;
         });
 
-        fs.writeFileSync('streams.json', JSON.stringify(verifiedItems, null, 2));
-        console.log(`Successfully updated streams.json with ${verifiedItems.length} verified items.`);
+        fs.writeFileSync('streams.json', JSON.stringify(finalItems, null, 2));
+        console.log(`Successfully updated streams.json with ${finalItems.length} unique items.`);
     } catch (e) {
         console.error('Update failed:', e.message);
         if (e.response) {
@@ -137,7 +162,7 @@ async function fetchRecentVideosFromPlaylist(playlistId) {
             params: {
                 part: 'snippet,contentDetails',
                 playlistId: playlistId,
-                maxResults: 50, // Increased to 50 to catch more skits/videos
+                maxResults: 50,
                 key: API_KEY,
             }
         });
@@ -209,22 +234,15 @@ async function fetchVideoDetails(videoIds) {
         }
 
         return allItems.map(item => {
-            let status = item.snippet.liveBroadcastContent; // 'live', 'upcoming', 'none'
+            let status = item.snippet.liveBroadcastContent;
             const liveDetails = item.liveStreamingDetails;
             const contentDetails = item.contentDetails;
 
-            // Duration-based classification:
-            // Aogiri skits are usually < 15-20 mins. 
-            // Streams are almost always > 30 mins.
-            // Using 25 minutes as the threshold.
             const durationSec = parseISO8601Duration(contentDetails?.duration || '');
-            const isLongVideo = durationSec > 25 * 60; // 25 mins
+            const isLongVideo = durationSec > 25 * 60;
 
-            // If it has live details, it's a candidate for 'stream'
             let type = liveDetails ? 'stream' : 'video';
 
-            // Exception: Premiered videos/Shorts frequently have liveDetails.
-            // If they are short (< 25 mins), treat them as 'video'.
             if (type === 'stream' && !isLongVideo && status === 'none') {
                 type = 'video';
             }
