@@ -1,17 +1,20 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity, Animated } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { getStreams, StreamInfo } from '../src/api/streams';
 import { getMemberSettings } from '../src/services/memberSettings';
 import StreamCard from '../src/components/stream/StreamCard';
 import { COLORS } from '../src/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function StreamListScreen() {
     const [streams, setStreams] = useState<StreamInfo[]>([]);
     const [allData, setAllData] = useState<{ liveAndUpcoming: StreamInfo[], ended: StreamInfo[] }>({ liveAndUpcoming: [], ended: [] });
-    const [visibleCount, setVisibleCount] = useState(6); // Reduced to 6
+    const [visibleCount, setVisibleCount] = useState(6);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+
+    const scrollY = useRef(new Animated.Value(0)).current;
 
     const loadStreams = useCallback(async (force = false) => {
         try {
@@ -33,7 +36,7 @@ export default function StreamListScreen() {
             setAllData({ liveAndUpcoming, ended });
 
             if (force) {
-                setVisibleCount(6); // Reduced to 6
+                setVisibleCount(6);
             }
         } catch (error) {
             console.error('Failed to load streams', error);
@@ -63,6 +66,25 @@ export default function StreamListScreen() {
         setVisibleCount(prev => prev + 10);
     };
 
+    // Animation values for the pull-down indicator
+    const pullIconRotate = scrollY.interpolate({
+        inputRange: [-100, 0],
+        outputRange: ['180deg', '0deg'],
+        extrapolate: 'clamp',
+    });
+
+    const pullIconScale = scrollY.interpolate({
+        inputRange: [-80, -30, 0],
+        outputRange: [1, 0.5, 0],
+        extrapolate: 'clamp',
+    });
+
+    const pullIndicatorOpacity = scrollY.interpolate({
+        inputRange: [-60, -20],
+        outputRange: [1, 0],
+        extrapolate: 'clamp',
+    });
+
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
@@ -75,20 +97,34 @@ export default function StreamListScreen() {
 
     return (
         <View style={styles.container}>
-            <FlatList
+            {/* Custom Refresh Indicator inside the pulled space */}
+            <Animated.View style={[
+                styles.pullIndicator,
+                {
+                    opacity: refreshing ? 0 : pullIndicatorOpacity,
+                    transform: [{ scale: pullIconScale }, { rotate: pullIconRotate }]
+                }
+            ]}>
+                <Ionicons name="refresh-circle" size={48} color={COLORS.primary} />
+            </Animated.View>
+
+            <Animated.FlatList
                 data={streams}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => <StreamCard stream={item} />}
                 contentContainerStyle={styles.listContent}
+                onScroll={Animated.event(
+                    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                    { useNativeDriver: true }
+                )}
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
                         tintColor={COLORS.primary}
-                        title="最新情報を取得中..."
-                        titleColor={COLORS.textSecondary}
                         colors={[COLORS.primary]}
                         progressBackgroundColor={COLORS.cardBackground}
+                        progressViewOffset={40}
                     />
                 }
                 ListFooterComponent={
@@ -136,10 +172,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: COLORS.background,
     },
+    pullIndicator: {
+        position: 'absolute',
+        top: 20,
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+        zIndex: 0,
+    },
     listContent: {
         paddingTop: 12,
-        paddingBottom: 80, // Increased bottom padding
+        paddingBottom: 80,
         flexGrow: 1,
+        backgroundColor: 'transparent',
     },
     emptyContainer: {
         padding: 40,
