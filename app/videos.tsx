@@ -9,7 +9,7 @@ import { COLORS } from '../src/constants/theme';
 export default function VideoListScreen() {
     const [videos, setVideos] = useState<StreamInfo[]>([]);
     const [allVideos, setAllVideos] = useState<StreamInfo[]>([]);
-    const [visibleCount, setVisibleCount] = useState(10);
+    const [visibleCount, setVisibleCount] = useState(6); // Reduced to 6
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
@@ -37,7 +37,7 @@ export default function VideoListScreen() {
             setAllVideos(filtered);
 
             if (force) {
-                setVisibleCount(10);
+                setVisibleCount(6); // Reduced to 6
             }
         } catch (error) {
             console.error('Failed to load videos', error);
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     },
     listContent: {
         paddingTop: 12,
-        paddingBottom: 20,
+        paddingBottom: 80, // Increased bottom padding
         flexGrow: 1,
     },
     emptyContainer: {

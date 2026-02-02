@@ -40,7 +40,7 @@ export const useNotifications = (streams: StreamInfo[]) => {
     useEffect(() => {
         const subscription = Notifications.addNotificationResponseReceivedListener(response => {
             const url = response.notification.request.content.data?.url;
-            if (url) {
+            if (typeof url === 'string') {
                 Linking.openURL(url);
             }
         });

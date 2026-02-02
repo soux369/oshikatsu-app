@@ -9,7 +9,7 @@ import { COLORS } from '../src/constants/theme';
 export default function StreamListScreen() {
     const [streams, setStreams] = useState<StreamInfo[]>([]);
     const [allData, setAllData] = useState<{ liveAndUpcoming: StreamInfo[], ended: StreamInfo[] }>({ liveAndUpcoming: [], ended: [] });
-    const [visibleCount, setVisibleCount] = useState(10);
+    const [visibleCount, setVisibleCount] = useState(6); // Reduced to 6
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
@@ -33,7 +33,7 @@ export default function StreamListScreen() {
             setAllData({ liveAndUpcoming, ended });
 
             if (force) {
-                setVisibleCount(10);
+                setVisibleCount(6); // Reduced to 6
             }
         } catch (error) {
             console.error('Failed to load streams', error);
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     },
     listContent: {
         paddingTop: 12,
-        paddingBottom: 20,
+        paddingBottom: 80, // Increased bottom padding
         flexGrow: 1,
     },
     emptyContainer: {
