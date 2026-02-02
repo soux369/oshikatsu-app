@@ -14,16 +14,20 @@ export { StreamInfo };
  * Main fetcher for the app. 
  * Reads from a hosted JSON file that is updated automatically via GitHub Actions.
  */
-export const getStreams = async (): Promise<StreamInfo[]> => {
-    // 1. Try Local Cache first (AsyncStorage)
-    const cached = await getLocalCache<StreamInfo[]>();
-    if (cached) {
-        return cached;
+export const getStreams = async (forceRefresh: boolean = false): Promise<StreamInfo[]> => {
+    // 1. Try Local Cache first (AsyncStorage), unless forced
+    if (!forceRefresh) {
+        const cached = await getLocalCache<StreamInfo[]>();
+        if (cached) {
+            return cached;
+        }
     }
 
     // 2. Fetch from Hosted JSON
     try {
-        const response = await axios.get<StreamInfo[]>(HOSTED_JSON_URL);
+        // Add a timestamp query param to prevent caching by GitHub Raw/CDN
+        const timestamp = new Date().getTime();
+        const response = await axios.get<StreamInfo[]>(`${HOSTED_JSON_URL}?t=${timestamp}`);
         const data = response.data;
 
         // 3. Save to Local Cache

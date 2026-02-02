@@ -9,9 +9,9 @@ export default function StreamListScreen() {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
-    const loadStreams = useCallback(async () => {
+    const loadStreams = useCallback(async (force = false) => {
         try {
-            const data = await getStreams();
+            const data = await getStreams(force);
             setStreams(data);
         } catch (error) {
             console.error('Failed to load streams', error);
@@ -22,12 +22,12 @@ export default function StreamListScreen() {
     }, []);
 
     useEffect(() => {
-        loadStreams();
+        loadStreams(); // Initial load (uses cache if available)
     }, [loadStreams]);
 
     const onRefresh = () => {
         setRefreshing(true);
-        loadStreams();
+        loadStreams(true); // Force refresh (bypasses cache)
     };
 
     if (loading) {
@@ -46,7 +46,16 @@ export default function StreamListScreen() {
                 renderItem={({ item }) => <StreamCard stream={item} />}
                 contentContainerStyle={styles.listContent}
                 refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        tintColor={COLORS.primary}
+                        title="最新情報を取得中..."
+                        titleColor={COLORS.textSecondary}
+                        colors={[COLORS.primary]}
+                        progressBackgroundColor={COLORS.cardBackground}
+                        progressViewOffset={10}
+                    />
                 }
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
@@ -71,6 +80,7 @@ const styles = StyleSheet.create({
     },
     listContent: {
         paddingBottom: 20,
+        flexGrow: 1, // Ensure pull-to-refresh works even when empty
     },
     emptyContainer: {
         padding: 40,
