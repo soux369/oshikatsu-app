@@ -19,11 +19,11 @@ export default function VideoListScreen() {
             ]);
 
             // 2. Filter logic:
-            // Include both uploaded videos AND archived streams in the Video tab
+            // Include only uploaded videos (exclude archived streams)
             const filtered = data.filter(s => {
-                const isContent = s.status === 'ended';
+                const isVideo = s.type === 'video';
                 const isAllowed = settings[s.channelId] !== false; // Default ON
-                return isContent && isAllowed;
+                return isVideo && isAllowed;
             });
 
             // Ensure sorted by date (newest first)

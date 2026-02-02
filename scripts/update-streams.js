@@ -14,7 +14,7 @@ const MEMBERS = [
     { id: 'UCFvEuP2EDkvrgJpHI6-pyNw', name: '我部 りえる' },
     { id: 'UCAHXqn4nAd2j3LRu1Qyi_JA', name: 'エトラ' },
     { id: 'UCmiYJycZXBGc4s_zjIRUHhQ', name: '春雨 麗女' },
-    { id: 'UC1sBUU-y9FlHNukwsrR4bmA', name: 'ぷわぷわぽぷら' }, // Corrected ID
+    { id: 'UC1sBUU-y9FlHNukwsrR4bmA', name: 'ぷわぷわぽぷら' },
     { id: 'UCIwHOJn_3QjBTwQ_gNj7WRA', name: '萌実' },
     { id: 'UCxy3KNlLQiN64tikKipnQNg', name: '月赴 ゐぶき' },
     { id: 'UCdi5pj0MDQ-3LFNUFIFmD8w', name: 'うる虎 がーる' },
@@ -33,7 +33,7 @@ async function update() {
         const channelIds = MEMBERS.map(m => m.id);
         const uploadsMap = await fetchUploadsPlaylistIds(channelIds);
 
-        console.log('Fetching latest videos from playlists (max 20)...');
+        console.log('Fetching latest items from playlists (max 50)...');
         let allVideoIds = [];
         let fetchedPlaylistsCount = 0;
 
@@ -52,7 +52,6 @@ async function update() {
             }
 
             // If Playlist failed (empty), try Force Search for this channel
-            // This is crucial for Official Channel or restricted playlists
             if (videoIds.length === 0) {
                 console.log(`Playlist fetch failed for ${member.name}, trying Search API...`);
                 videoIds = await fetchVideosBySearch(member.id);
@@ -66,7 +65,7 @@ async function update() {
         results.forEach(ids => allVideoIds.push(...ids));
         console.log(`Fetched content from ${fetchedPlaylistsCount}/${MEMBERS.length} channels.`);
 
-        // 2. Fetch Upcoming Streams explicitly via Search API (Global search for upcoming)
+        // 2. Fetch Upcoming Streams explicitly via Search API
         console.log('Fetching upcoming streams from Search API...');
         const upcomingIds = await fetchUpcomingStreams();
         allVideoIds.push(...upcomingIds);
@@ -129,18 +128,16 @@ async function fetchRecentVideosFromPlaylist(playlistId) {
             params: {
                 part: 'snippet,contentDetails',
                 playlistId: playlistId,
-                maxResults: 20,
+                maxResults: 50,
                 key: API_KEY,
             }
         });
         return response.data.items.map(item => item.contentDetails.videoId);
     } catch (error) {
-        // console.warn(`Failed to fetch playlist ${playlistId}:`, error.message);
         return [];
     }
 }
 
-// Fallback: Fetch videos using Search API for a specific channel
 async function fetchVideosBySearch(channelId) {
     const url = `https://www.googleapis.com/youtube/v3/search`;
     try {
@@ -150,7 +147,7 @@ async function fetchVideosBySearch(channelId) {
                 channelId: channelId,
                 type: 'video',
                 order: 'date',
-                maxResults: 10, // Limit because search is expensive (100 units)
+                maxResults: 20,
                 key: API_KEY,
             }
         });
@@ -203,7 +200,7 @@ async function fetchVideoDetails(videoIds) {
         }
 
         return allItems.map(item => {
-            let status = item.snippet.liveBroadcastContent; // 'live', 'upcoming', 'none'
+            let status = item.snippet.liveBroadcastContent;
             const liveDetails = item.liveStreamingDetails;
 
             const isStream = !!liveDetails;
