@@ -1,13 +1,15 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { getStreams, StreamInfo } from '../src/api/streams';
-import { getNotificationSettings } from '../src/services/memberSettings';
+import { getMemberSettings } from '../src/services/memberSettings';
 import StreamCard from '../src/components/stream/StreamCard';
 import { COLORS } from '../src/constants/theme';
 
 export default function VideoListScreen() {
     const [videos, setVideos] = useState<StreamInfo[]>([]);
+    const [allVideos, setAllVideos] = useState<StreamInfo[]>([]);
+    const [visibleCount, setVisibleCount] = useState(10);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
@@ -15,14 +17,13 @@ export default function VideoListScreen() {
         try {
             const [data, settings] = await Promise.all([
                 getStreams(force),
-                getNotificationSettings()
+                getMemberSettings()
             ]);
 
-            // 2. Filter logic:
-            // Include only uploaded videos (exclude archived streams)
             const filtered = data.filter(s => {
                 const isVideo = s.type === 'video';
-                const isAllowed = settings[s.channelId] !== false; // Default ON
+                const pref = settings[s.channelId];
+                const isAllowed = pref ? pref.display : true;
                 return isVideo && isAllowed;
             });
 
@@ -33,7 +34,11 @@ export default function VideoListScreen() {
                 return timeB - timeA;
             });
 
-            setVideos(filtered);
+            setAllVideos(filtered);
+
+            if (force) {
+                setVisibleCount(10);
+            }
         } catch (error) {
             console.error('Failed to load videos', error);
         } finally {
@@ -48,9 +53,17 @@ export default function VideoListScreen() {
         }, [loadVideos])
     );
 
+    useEffect(() => {
+        setVideos(allVideos.slice(0, visibleCount));
+    }, [allVideos, visibleCount]);
+
     const onRefresh = () => {
         setRefreshing(true);
         loadVideos(true);
+    };
+
+    const loadMore = () => {
+        setVisibleCount(prev => prev + 10);
     };
 
     if (loading) {
@@ -60,6 +73,8 @@ export default function VideoListScreen() {
             </View>
         );
     }
+
+    const hasMore = allVideos.length > visibleCount;
 
     return (
         <View style={styles.container}>
@@ -73,23 +88,34 @@ export default function VideoListScreen() {
                         refreshing={refreshing}
                         onRefresh={onRefresh}
                         tintColor={COLORS.primary}
-                        title="動画情報を取得中..."
+                        title="最新動画を取得中..."
                         titleColor={COLORS.textSecondary}
                         colors={[COLORS.primary]}
                         progressBackgroundColor={COLORS.cardBackground}
-                        progressViewOffset={10}
                     />
+                }
+                ListFooterComponent={
+                    hasMore ? (
+                        <TouchableOpacity
+                            style={styles.moreButton}
+                            onPress={loadMore}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={styles.moreButtonText}>さらに10件表示</Text>
+                        </TouchableOpacity>
+                    ) : (
+                        allVideos.length > 0 ? <View style={{ height: 40 }} /> : null
+                    )
                 }
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
-                        <Text style={styles.emptyText}>現在新しい動画はありません</Text>
+                        <Text style={styles.emptyText}>動画が見つかりませんでした</Text>
                     </View>
                 }
             />
-            {/* Manual Refresh FAB */}
             <TouchableOpacity
                 style={styles.fab}
-                onPress={() => loadVideos(true)}
+                onPress={onRefresh}
                 disabled={loading || refreshing}
             >
                 {refreshing ? (
@@ -114,6 +140,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.background,
     },
     listContent: {
+        paddingTop: 12,
         paddingBottom: 20,
         flexGrow: 1,
     },
@@ -123,7 +150,22 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         color: COLORS.textSecondary,
-        fontSize: 16,
+        fontSize: 14,
+    },
+    moreButton: {
+        paddingVertical: 14,
+        alignItems: 'center',
+        backgroundColor: '#262626',
+        marginHorizontal: 16,
+        marginVertical: 12,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#333',
+    },
+    moreButtonText: {
+        color: '#eee',
+        fontSize: 14,
+        fontWeight: 'bold',
     },
     fab: {
         position: 'absolute',
@@ -137,9 +179,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         elevation: 6,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.3,
-        shadowRadius: 3,
+        shadowRadius: 4,
         zIndex: 1000,
     },
     fabText: {

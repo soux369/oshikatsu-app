@@ -42,4 +42,5 @@ export interface StreamInfo {
     type: 'stream' | 'video';
     channelTitle: string;
     channelId: string;
+    duration?: string; // ISO 8601 duration
 }

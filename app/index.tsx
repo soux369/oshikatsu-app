@@ -2,14 +2,14 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { getStreams, StreamInfo } from '../src/api/streams';
-import { getNotificationSettings } from '../src/services/memberSettings';
+import { getMemberSettings } from '../src/services/memberSettings';
 import StreamCard from '../src/components/stream/StreamCard';
 import { COLORS } from '../src/constants/theme';
 
 export default function StreamListScreen() {
     const [streams, setStreams] = useState<StreamInfo[]>([]);
-    const [hasMoreArchives, setHasMoreArchives] = useState(false);
-    const [showAllArchives, setShowAllArchives] = useState(false);
+    const [allData, setAllData] = useState<{ liveAndUpcoming: StreamInfo[], ended: StreamInfo[] }>({ liveAndUpcoming: [], ended: [] });
+    const [visibleCount, setVisibleCount] = useState(10);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
@@ -17,52 +17,50 @@ export default function StreamListScreen() {
         try {
             const [data, settings] = await Promise.all([
                 getStreams(force),
-                getNotificationSettings()
+                getMemberSettings()
             ]);
 
-            // Filter logic:
-            // 1. Filter by type 'stream' (or missing type for backward compat)
-            // 2. Filter by member settings
             const filtered = data.filter(s => {
                 const isStream = s.type === 'stream' || !s.type;
-                const isAllowed = settings[s.channelId] !== false; // Default ON
+                const pref = settings[s.channelId];
+                const isAllowed = pref ? pref.display : true;
                 return isStream && isAllowed;
             });
 
-            // Separate Live/Upcoming from Ended
             const liveAndUpcoming = filtered.filter(s => s.status === 'live' || s.status === 'upcoming');
             const ended = filtered.filter(s => s.status === 'ended');
 
-            setHasMoreArchives(ended.length > 10);
+            setAllData({ liveAndUpcoming, ended });
 
-            // If showAllArchives is true, show all. Otherwise show 10.
-            const displayEnded = (showAllArchives || force === true) ? ended : ended.slice(0, 10);
-
-            setStreams([...liveAndUpcoming, ...displayEnded]);
+            if (force) {
+                setVisibleCount(10);
+            }
         } catch (error) {
             console.error('Failed to load streams', error);
         } finally {
             setLoading(false);
             setRefreshing(false);
         }
-    }, [showAllArchives]);
+    }, []);
 
-    // Refresh when screen comes into focus
     useFocusEffect(
         useCallback(() => {
             loadStreams();
         }, [loadStreams])
     );
 
-    // If showAllArchives changes, reload the list
     useEffect(() => {
-        loadStreams();
-    }, [showAllArchives]);
+        const displayEnded = allData.ended.slice(0, visibleCount);
+        setStreams([...allData.liveAndUpcoming, ...displayEnded]);
+    }, [allData, visibleCount]);
 
     const onRefresh = () => {
         setRefreshing(true);
-        setShowAllArchives(false); // Reset on refresh
         loadStreams(true);
+    };
+
+    const loadMore = () => {
+        setVisibleCount(prev => prev + 10);
     };
 
     if (loading) {
@@ -72,6 +70,8 @@ export default function StreamListScreen() {
             </View>
         );
     }
+
+    const hasMore = allData.ended.length > visibleCount;
 
     return (
         <View style={styles.container}>
@@ -89,29 +89,30 @@ export default function StreamListScreen() {
                         titleColor={COLORS.textSecondary}
                         colors={[COLORS.primary]}
                         progressBackgroundColor={COLORS.cardBackground}
-                        progressViewOffset={10}
                     />
                 }
                 ListFooterComponent={
-                    hasMoreArchives && !showAllArchives ? (
+                    hasMore ? (
                         <TouchableOpacity
                             style={styles.moreButton}
-                            onPress={() => setShowAllArchives(true)}
+                            onPress={loadMore}
+                            activeOpacity={0.8}
                         >
-                            <Text style={styles.moreButtonText}>過去の配信をもっと見る</Text>
+                            <Text style={styles.moreButtonText}>さらに10件表示</Text>
                         </TouchableOpacity>
-                    ) : null
+                    ) : (
+                        allData.ended.length > 0 ? <View style={{ height: 40 }} /> : null
+                    )
                 }
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
-                        <Text style={styles.emptyText}>現在予定されている配信はありません</Text>
+                        <Text style={styles.emptyText}>予定されている配信はありません</Text>
                     </View>
                 }
             />
-            {/* Manual Refresh FAB */}
             <TouchableOpacity
                 style={styles.fab}
-                onPress={() => onRefresh()}
+                onPress={onRefresh}
                 disabled={loading || refreshing}
             >
                 {refreshing ? (
@@ -136,6 +137,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.background,
     },
     listContent: {
+        paddingTop: 12,
         paddingBottom: 20,
         flexGrow: 1,
     },
@@ -145,20 +147,20 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         color: COLORS.textSecondary,
-        fontSize: 16,
+        fontSize: 14,
     },
     moreButton: {
-        padding: 16,
+        paddingVertical: 14,
         alignItems: 'center',
-        backgroundColor: COLORS.cardBackground,
+        backgroundColor: '#262626',
         marginHorizontal: 16,
-        marginVertical: 10,
-        borderRadius: 8,
+        marginVertical: 12,
+        borderRadius: 12,
         borderWidth: 1,
-        borderColor: COLORS.divider,
+        borderColor: '#333',
     },
     moreButtonText: {
-        color: COLORS.primary,
+        color: '#eee',
         fontSize: 14,
         fontWeight: 'bold',
     },
@@ -174,9 +176,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         elevation: 6,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.3,
-        shadowRadius: 3,
+        shadowRadius: 4,
         zIndex: 1000,
     },
     fabText: {

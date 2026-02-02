@@ -28,7 +28,8 @@ export const useNotifications = (streams: StreamInfo[]) => {
 
         for (const stream of upcomingStreams) {
             // Default to ON if not set specifically
-            const isEnabled = settings[stream.channelId] ?? true;
+            const pref = settings[stream.channelId];
+            const isEnabled = pref ? pref.notify : true; // Default true
             if (isEnabled) {
                 await scheduleStreamNotification(stream);
             }
