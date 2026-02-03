@@ -145,7 +145,6 @@ export default function StreamCard({ stream }: Props) {
                             <Text style={styles.separator}>•</Text>
                             <Text style={styles.time}>{dateStr}</Text>
                         </View>
-                        <Text style={styles.disclaimer}>※非公式ファンアプリ</Text>
                     </View>
                 </View>
             </View>
@@ -222,7 +221,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: '600',
         color: COLORS.textPrimary,
-        marginBottom: 2,
+        marginBottom: 4,
         lineHeight: 20,
     },
     titleEnded: {
@@ -244,11 +243,5 @@ const styles = StyleSheet.create({
     time: {
         fontSize: 13,
         color: COLORS.textSecondary,
-    },
-    disclaimer: {
-        fontSize: 10,
-        color: COLORS.textSecondary,
-        opacity: 0.6,
-        fontStyle: 'italic',
     },
 });

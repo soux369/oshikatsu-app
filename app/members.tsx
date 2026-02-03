@@ -48,7 +48,6 @@ export default function MemberListScreen() {
                     </View>
                     <View>
                         <Text style={styles.memberName}>{item.name}</Text>
-                        <Text style={styles.disclaimer}>※非公式ファンアプリ</Text>
                     </View>
                 </View>
                 <View style={styles.switchGroup}>
@@ -89,6 +88,7 @@ export default function MemberListScreen() {
                             表示：リスト（ホーム・動画）への表示切り替え{"\n"}
                             通知：配信開始時のプッシュ通知
                         </Text>
+                        <Text style={styles.headerDisclaimer}>※本アプリはファンによる非公式アプリであり、公式とは一切関係ありません。</Text>
                     </View>
                 }
             />
@@ -176,5 +176,13 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: COLORS.textSecondary,
         lineHeight: 18,
+        marginBottom: 8,
+    },
+    headerDisclaimer: {
+        fontSize: 11,
+        color: COLORS.textSecondary,
+        opacity: 0.8,
+        fontStyle: 'italic',
+        marginTop: 4,
     },
 });
