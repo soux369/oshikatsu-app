@@ -11,59 +11,58 @@ interface Props {
 
 export default function StreamCard({ stream }: Props) {
     const member = getMemberById(stream.channelId);
-    const [timeLeft, setTimeLeft] = React.useState('');
-    const [elapsedTime, setElapsedTime] = React.useState('');
+    // --- Timer Logic Helpers ---
+    const getInitialTimeInfo = () => {
+        if (stream.status === 'ended' || !stream.scheduledStartTime) {
+            return { timeLeft: '', elapsedTime: '' };
+        }
+        const start = new Date(stream.scheduledStartTime!).getTime();
+        const now = new Date().getTime();
+        const diff = start - now;
+
+        if (diff > 0) {
+            const hrs = Math.floor(diff / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+            const text = hrs > 0 ? `あと ${hrs}時間${mins}分` : (mins > 0 ? `あと ${mins}分${secs}秒` : `あと ${secs}秒`);
+            return { timeLeft: text, elapsedTime: '' };
+        } else {
+            const elapsedDiff = now - start;
+            const hrs = Math.floor(elapsedDiff / (1000 * 60 * 60));
+            const mins = Math.floor((elapsedDiff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((elapsedDiff % (1000 * 60)) / 1000);
+            const elapsed = hrs > 0
+                ? `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+                : `${mins}:${secs.toString().padStart(2, '0')}`;
+            return { timeLeft: '間もなく開始', elapsedTime: elapsed };
+        }
+    };
+
+    const initialInfo = getInitialTimeInfo();
+    const [timeLeft, setTimeLeft] = React.useState(initialInfo.timeLeft);
+    const [elapsedTime, setElapsedTime] = React.useState(initialInfo.elapsedTime);
 
     React.useEffect(() => {
-        if (stream.status === 'ended' || !stream.scheduledStartTime) {
-            setTimeLeft('');
-            setElapsedTime('');
-            return;
-        }
+        if (stream.status === 'ended' || !stream.scheduledStartTime) return;
 
-        const start = new Date(stream.scheduledStartTime!).getTime();
-
-        const update = () => {
-            const now = new Date().getTime();
-            const diff = start - now;
-
-            if (diff > 0) {
-                // カウントダウン表示 
-                const hrs = Math.floor(diff / (1000 * 60 * 60));
-                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const secs = Math.floor((diff % (1000 * 60)) / 1000);
-
-                if (hrs > 0) setTimeLeft(`あと ${hrs}時間${mins}分`);
-                else if (mins > 0) setTimeLeft(`あと ${mins}分${secs}秒`);
-                else setTimeLeft(`あと ${secs}秒`);
-
-                setElapsedTime('');
-            } else {
-                // 経過時間表示（配信開始と推定）
-                setTimeLeft('間もなく開始');
-                const elapsedDiff = now - start;
-                const hrs = Math.floor(elapsedDiff / (1000 * 60 * 60));
-                const mins = Math.floor((elapsedDiff % (1000 * 60 * 60)) / (1000 * 60));
-                const secs = Math.floor((elapsedDiff % (1000 * 60)) / 1000);
-
-                if (hrs > 0) {
-                    setElapsedTime(`${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
-                } else {
-                    setElapsedTime(`${mins}:${secs.toString().padStart(2, '0')}`);
-                }
-            }
-        };
-
-        update();
-        const timer = setInterval(update, 1000);
+        const timer = setInterval(() => {
+            const info = getInitialTimeInfo();
+            setTimeLeft(info.timeLeft);
+            setElapsedTime(info.elapsedTime);
+        }, 1000);
         return () => clearInterval(timer);
     }, [stream.status, stream.scheduledStartTime]);
 
     const isLive = React.useMemo(() => {
         if (stream.status === 'live') return true;
+        // 予定時刻を過ぎていれば「ライブ中」として扱う（UIラグ対策）
+        if (stream.status === 'upcoming' && stream.scheduledStartTime) {
+            const isPastStart = new Date(stream.scheduledStartTime).getTime() <= new Date().getTime();
+            if (isPastStart) return true;
+        }
         if (stream.status === 'upcoming' && timeLeft === '間もなく開始') return true;
         return false;
-    }, [stream.status, timeLeft]);
+    }, [stream.status, stream.scheduledStartTime, timeLeft]);
 
     const openStream = () => {
         Linking.openURL(`https://www.youtube.com/watch?v=${stream.id}`);
