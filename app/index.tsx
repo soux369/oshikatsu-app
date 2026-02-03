@@ -13,8 +13,48 @@ const normalizeText = (text: string) => {
     return text
         .replace(/[ァ-ン]/g, s => String.fromCharCode(s.charCodeAt(0) - 0x60)) // Katakana to Hiragana
         .replace(/[Ａ-Ｚａ-ｚ０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xfee0)) // Full-width to Half-width
-        .replace(/[ー-\s]/g, '') // Remove long vowels, hyphens, spaces
+        .replace(/[ー－‐‑–—―−－⁻₋]/g, '') // Remove all types of long vowels/dashes
+        .replace(/[\s\t\n\r]/g, '') // Remove all whitespace
         .toLowerCase();
+};
+
+const getLevenshteinDistance = (a: string, b: string): number => {
+    const matrix = [];
+    for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+    for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+
+    for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+            if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                matrix[i][j] = matrix[i - 1][j - 1];
+            } else {
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j - 1] + 1,
+                    matrix[i][j - 1] + 1,
+                    matrix[i - 1][j] + 1
+                );
+            }
+        }
+    }
+    return matrix[b.length][a.length];
+};
+
+const isFuzzyMatch = (target: string, query: string) => {
+    const nTarget = normalizeText(target);
+    const nQuery = normalizeText(query);
+    if (nTarget.includes(nQuery)) return true;
+
+    // For typos (especially useful for names or titles)
+    // If the query is long enough, allow a small edit distance
+    if (nQuery.length >= 3) {
+        // Optimization: check if target contains a similar substring
+        for (let i = 0; i <= nTarget.length - nQuery.length; i++) {
+            const sub = nTarget.substring(i, i + nQuery.length);
+            const dist = getLevenshteinDistance(sub, nQuery);
+            if (dist <= 1) return true; // Allow 1 typo
+        }
+    }
+    return false;
 };
 
 const SearchBar = React.memo(({ onChange }: { onChange: (text: string) => void }) => {
@@ -147,10 +187,9 @@ export default function StreamListScreen() {
 
         // Search
         if (searchQuery) {
-            const query = normalizeText(searchQuery);
             filtered = filtered.filter(s =>
-                normalizeText(s.title).includes(query) ||
-                normalizeText(s.channelTitle).includes(query)
+                isFuzzyMatch(s.title, searchQuery) ||
+                isFuzzyMatch(s.channelTitle, searchQuery)
             );
         }
 

@@ -163,13 +163,15 @@ export default function StreamCard({ stream }: Props) {
                     source={{ uri: stream.thumbnailUrl }}
                     style={[styles.thumbnail, isActualEndedStream && styles.thumbnailEnded]}
                 />
-                <View style={styles.badgeContainer}>
-                    {getStatusBadge()}
+                <View style={styles.bottomLeftBadgeContainer}>
                     {durationStr !== '' && (
                         <View style={[styles.badge, styles.durationBadge]}>
                             <Text style={styles.badgeText}>{durationStr}</Text>
                         </View>
                     )}
+                </View>
+                <View style={styles.bottomRightBadgeContainer}>
+                    {getStatusBadge()}
                 </View>
             </View>
             <View style={styles.infoContainer}>
@@ -241,13 +243,17 @@ const styles = StyleSheet.create({
     thumbnailEnded: {
         opacity: 0.6,
     },
-    badgeContainer: {
+    bottomLeftBadgeContainer: {
         position: 'absolute',
         bottom: 8,
         left: 8,
-        flexDirection: 'column',
         alignItems: 'flex-start',
-        gap: 4,
+    },
+    bottomRightBadgeContainer: {
+        position: 'absolute',
+        bottom: 8,
+        right: 8,
+        alignItems: 'flex-end',
     },
     badge: {
         paddingHorizontal: 8,
