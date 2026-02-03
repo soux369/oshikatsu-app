@@ -31,10 +31,19 @@ export async function registerForPushNotificationsAsync() {
             return;
         }
 
-        // ProjectID is required for Expo Go and newer SDKs
+        // ProjectID is required for Expo Go and newer SDKs.
+        // If you haven't set up EAS yet, this might be undefined.
         const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
-        token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
-        console.log('Expo Push Token:', token);
+
+        try {
+            token = (await Notifications.getExpoPushTokenAsync(
+                projectId && !projectId.includes('your-project-id') ? { projectId } : undefined
+            )).data;
+            console.log('Expo Push Token:', token);
+        } catch (tokenError) {
+            console.error('Failed to get Expo Push Token. If you are using Expo Go, make sure you are logged in.', tokenError);
+            return;
+        }
 
         // GASにトークンを登録
         if (GAS_URL) {

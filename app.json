@@ -40,9 +40,7 @@
       "router": {
         "origin": false
       },
-      "eas": {
-        "projectId": "your-project-id"
-      },
+      "eas": {},
       "gasUrl": "https://script.google.com/macros/s/AKfycby12unxMV7upcZLViyQzfRrGsVlIkcQ8zWoZeh_pEhEzUO-NlLvlsH-5Uj92caqQbuukw/exec"
     }
   }
