@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Switch, Image, TouchableOpacity, Linking } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { AOGIRI_MEMBERS, Member } from '../src/constants/members';
 import { getMemberSettings, saveMemberSettings, MemberSettingsMap } from '../src/services/memberSettings';
 import { getStreams, StreamInfo } from '../src/api/streams';
@@ -122,32 +123,35 @@ export default function MemberListScreen() {
                             </Text>
                         </View>
 
-                        <View style={styles.bulkActionRow}>
-                            <Text style={styles.bulkLabel}>一括設定:</Text>
-                            <View style={styles.bulkButtons}>
-                                <TouchableOpacity style={styles.bulkBtn} onPress={() => bulkUpdate('display', 'all')}>
-                                    <Text style={styles.bulkBtnText}>全て表示</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.bulkBtn} onPress={() => bulkUpdate('display', 'none')}>
-                                    <Text style={styles.bulkBtnText}>解除</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.bulkBtn} onPress={() => bulkUpdate('display', 'invert')}>
-                                    <Text style={styles.bulkBtnText}>反転</Text>
-                                </TouchableOpacity>
+                        <View style={styles.bulkActionLayout}>
+                            <View style={styles.bulkGroup}>
+                                <Text style={styles.bulkLabel}>表示:</Text>
+                                <View style={styles.bulkToggles}>
+                                    <TouchableOpacity style={styles.bulkToggleBtn} onPress={() => bulkUpdate('display', 'all')}>
+                                        <Ionicons name="checkbox" size={18} color={COLORS.primary} />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.bulkToggleBtn} onPress={() => bulkUpdate('display', 'none')}>
+                                        <Ionicons name="square-outline" size={18} color={COLORS.textSecondary} />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.bulkToggleBtn} onPress={() => bulkUpdate('display', 'invert')}>
+                                        <Ionicons name="swap-horizontal" size={18} color={COLORS.textSecondary} />
+                                    </TouchableOpacity>
+                                </View>
                             </View>
-                        </View>
-                        <View style={styles.bulkActionRow}>
-                            <Text style={styles.bulkLabel}>通知設定:</Text>
-                            <View style={styles.bulkButtons}>
-                                <TouchableOpacity style={[styles.bulkBtn, { borderColor: '#FFC107' }]} onPress={() => bulkUpdate('notify', 'all')}>
-                                    <Text style={[styles.bulkBtnText, { color: '#FFC107' }]}>全て通知</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={[styles.bulkBtn, { borderColor: '#FFC107' }]} onPress={() => bulkUpdate('notify', 'none')}>
-                                    <Text style={[styles.bulkBtnText, { color: '#FFC107' }]}>解除</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={[styles.bulkBtn, { borderColor: '#FFC107' }]} onPress={() => bulkUpdate('notify', 'invert')}>
-                                    <Text style={[styles.bulkBtnText, { color: '#FFC107' }]}>反転</Text>
-                                </TouchableOpacity>
+                            <View style={styles.bulkDivider} />
+                            <View style={styles.bulkGroup}>
+                                <Text style={styles.bulkLabel}>通知:</Text>
+                                <View style={styles.bulkToggles}>
+                                    <TouchableOpacity style={styles.bulkToggleBtn} onPress={() => bulkUpdate('notify', 'all')}>
+                                        <Ionicons name="notifications" size={18} color="#FFC107" />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.bulkToggleBtn} onPress={() => bulkUpdate('notify', 'none')}>
+                                        <Ionicons name="notifications-off-outline" size={18} color={COLORS.textSecondary} />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.bulkToggleBtn} onPress={() => bulkUpdate('notify', 'invert')}>
+                                        <Ionicons name="swap-horizontal" size={18} color={COLORS.textSecondary} />
+                                    </TouchableOpacity>
+                                </View>
                             </View>
                         </View>
                     </View>
@@ -252,34 +256,39 @@ const styles = StyleSheet.create({
         lineHeight: 18,
         textAlign: 'center',
     },
-    bulkActionRow: {
+    bulkActionLayout: {
         flexDirection: 'row',
         alignItems: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+        borderRadius: 12,
+        padding: 8,
         marginTop: 12,
-        paddingHorizontal: 4,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.05)',
+    },
+    bulkGroup: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    bulkDivider: {
+        width: 1,
+        height: 24,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        marginHorizontal: 8,
     },
     bulkLabel: {
         color: COLORS.textSecondary,
         fontSize: 12,
         fontWeight: 'bold',
-        width: 60,
+        marginRight: 8,
     },
-    bulkButtons: {
-        flex: 1,
+    bulkToggles: {
         flexDirection: 'row',
-        gap: 8,
+        gap: 12,
     },
-    bulkBtn: {
-        paddingVertical: 6,
-        paddingHorizontal: 10,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: COLORS.primary,
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    },
-    bulkBtnText: {
-        fontSize: 11,
-        color: COLORS.primary,
-        fontWeight: 'bold',
+    bulkToggleBtn: {
+        padding: 4,
     },
 });

@@ -48,7 +48,18 @@ export default function StreamCard({ stream }: Props) {
         Linking.openURL(`https://www.youtube.com/watch?v=${stream.id}`);
     };
 
-    // Helper to parse duration: PT1M5S -> total seconds
+    const durationStr = React.useMemo(() => {
+        if (!stream.duration) return '';
+        const match = stream.duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+        if (!match) return '';
+        const h = parseInt(match[1] || '0');
+        const m = parseInt(match[2] || '0');
+        const s = parseInt(match[3] || '0');
+
+        if (h > 0) return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        return `${m}:${s.toString().padStart(2, '0')}`;
+    }, [stream.duration]);
+
     const isShort = React.useMemo(() => {
         if (!stream.duration) return false;
         const match = stream.duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
@@ -57,9 +68,7 @@ export default function StreamCard({ stream }: Props) {
         const m = parseInt(match[2] || '0');
         const s = parseInt(match[3] || '0');
         const totalSec = h * 3600 + m * 60 + s;
-        // YouTube Shorts are < 60s. Aogiri "skits" might be longer, but they are 'video' type.
-        // If it's very short, it's definitely a Short.
-        return totalSec < 62; // 62s buffer
+        return totalSec < 62;
     }, [stream.duration]);
 
     // Format date/time
@@ -156,6 +165,11 @@ export default function StreamCard({ stream }: Props) {
                 />
                 <View style={styles.badgeContainer}>
                     {getStatusBadge()}
+                    {durationStr !== '' && !isShort && (
+                        <View style={[styles.badge, styles.durationBadge]}>
+                            <Text style={styles.badgeText}>{durationStr}</Text>
+                        </View>
+                    )}
                 </View>
             </View>
             <View style={styles.infoContainer}>
@@ -236,6 +250,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 4,
+    },
+    durationBadge: {
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        marginTop: 4,
     },
     badgeText: {
         color: 'white',

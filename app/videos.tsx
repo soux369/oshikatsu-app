@@ -35,7 +35,6 @@ const SearchBar = React.memo(({ onChange }: { onChange: (text: string) => void }
                 placeholderTextColor={COLORS.textSecondary}
                 value={localValue}
                 onChangeText={setLocalValue}
-                clearButtonMode="while-editing"
                 autoCapitalize="none"
                 autoCorrect={false}
                 blurOnSubmit={true}
@@ -44,6 +43,11 @@ const SearchBar = React.memo(({ onChange }: { onChange: (text: string) => void }
                     onChange(e.nativeEvent.text);
                 }}
             />
+            {localValue.length > 0 && (
+                <TouchableOpacity onPress={() => setLocalValue('')} style={styles.clearButton}>
+                    <Ionicons name="close-circle" size={18} color={COLORS.textSecondary} />
+                </TouchableOpacity>
+            )}
         </View>
     );
 });
@@ -297,10 +301,11 @@ const styles = StyleSheet.create({
     },
     pullIndicator: {
         position: 'absolute',
-        top: 35,
+        top: 90, // Adjusted for search bar
         left: 0,
         right: 0,
         alignItems: 'center',
+        zIndex: 100,
     },
     listContent: {
         paddingTop: 12,
@@ -346,6 +351,10 @@ const styles = StyleSheet.create({
         flex: 1,
         color: COLORS.textPrimary,
         fontSize: 15,
+        paddingVertical: 8,
+    },
+    clearButton: {
+        padding: 4,
     },
     sortToggle: {
         flexDirection: 'row',
