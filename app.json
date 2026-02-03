@@ -40,8 +40,11 @@
       "router": {
         "origin": false
       },
-      "eas": {},
+      "eas": {
+        "projectId": "d729a71a-9251-43fb-9b4e-38e7ba3191ee"
+      },
       "gasUrl": "https://script.google.com/macros/s/AKfycby12unxMV7upcZLViyQzfRrGsVlIkcQ8zWoZeh_pEhEzUO-NlLvlsH-5Uj92caqQbuukw/exec"
-    }
+    },
+    "owner": "mono0261"
   }
 }
