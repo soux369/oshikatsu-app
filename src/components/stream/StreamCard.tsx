@@ -66,33 +66,33 @@ export default function StreamCard({ stream }: Props) {
         if (isShort) {
             return (
                 <View style={[styles.badge, { backgroundColor: '#FF0000' }]}>
-                    <Text style={styles.badgeText}>SHORT</Text>
+                    <Text style={styles.badgeText}>ショート</Text>
                 </View>
             );
         }
         if (stream.type === 'video') {
             return (
                 <View style={[styles.badge, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
-                    <Text style={styles.badgeText}>VIDEO</Text>
+                    <Text style={styles.badgeText}>動画</Text>
                 </View>
             );
         }
         if (stream.status === 'live') {
             return (
                 <View style={[styles.badge, { backgroundColor: '#cc0000' }]}>
-                    <Text style={styles.badgeText}>LIVE</Text>
+                    <Text style={styles.badgeText}>ライブ</Text>
                 </View>
             );
         } else if (stream.status === 'ended') {
             return (
                 <View style={[styles.badge, { backgroundColor: 'rgba(0, 0, 0, 0.8)' }]}>
-                    <Text style={styles.badgeText}>ARCHIVE</Text>
+                    <Text style={styles.badgeText}>アーカイブ</Text>
                 </View>
             );
         }
         return (
             <View style={[styles.badge, { backgroundColor: '#E91E63' }]}>
-                <Text style={styles.badgeText}>UPCOMING</Text>
+                <Text style={styles.badgeText}>配信予定</Text>
             </View>
         );
     };

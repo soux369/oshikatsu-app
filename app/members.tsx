@@ -103,11 +103,11 @@ export default function MemberListScreen() {
                 ListHeaderComponent={
                     <View style={styles.header}>
                         <Text style={styles.headerTitle}>メンバー設定</Text>
-                        <Text style={styles.headerDesc}>
-                            表示：リスト（ホーム・動画）への表示切り替え{"\n"}
-                            通知：配信開始時のプッシュ通知
-                        </Text>
-                        <Text style={styles.headerDisclaimer}>※本アプリはファンによる非公式アプリであり、公式とは一切関係ありません。</Text>
+                        <View style={styles.disclaimerBox}>
+                            <Text style={styles.headerDisclaimer}>
+                                ※本アプリはファンによる非公式アプリであり、公式（あおぎり高校）とは一切関係ありません。
+                            </Text>
+                        </View>
                     </View>
                 }
             />
@@ -191,22 +191,23 @@ const styles = StyleSheet.create({
         borderBottomColor: COLORS.divider,
     },
     headerTitle: {
-        fontSize: 22,
+        fontSize: 24,
         fontWeight: 'bold',
         color: COLORS.textPrimary,
-        marginBottom: 6,
+        marginBottom: 12,
     },
-    headerDesc: {
-        fontSize: 13,
-        color: COLORS.textSecondary,
-        lineHeight: 18,
-        marginBottom: 8,
+    disclaimerBox: {
+        backgroundColor: 'rgba(255, 0, 0, 0.1)',
+        padding: 12,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 0, 0, 0.3)',
     },
     headerDisclaimer: {
-        fontSize: 11,
-        color: COLORS.textSecondary,
-        opacity: 0.8,
-        fontStyle: 'italic',
-        marginTop: 4,
+        fontSize: 14,
+        color: '#ff4444',
+        fontWeight: 'bold',
+        lineHeight: 20,
+        textAlign: 'center',
     },
 });
