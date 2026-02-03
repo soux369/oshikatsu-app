@@ -15,59 +15,48 @@ export default function StreamCard({ stream }: Props) {
     const [elapsedTime, setElapsedTime] = React.useState('');
 
     React.useEffect(() => {
-        if (stream.status === 'upcoming' && stream.scheduledStartTime) {
-            const updateTimer = () => {
-                const now = new Date().getTime();
-                const start = new Date(stream.scheduledStartTime!).getTime();
-                const diff = start - now;
+        if (stream.status === 'ended' || !stream.scheduledStartTime) {
+            setTimeLeft('');
+            setElapsedTime('');
+            return;
+        }
 
-                if (diff <= 0) {
-                    setTimeLeft('間もなく開始');
-                    return;
-                }
+        const start = new Date(stream.scheduledStartTime!).getTime();
 
+        const update = () => {
+            const now = new Date().getTime();
+            const diff = start - now;
+
+            if (diff > 0) {
+                // カウントダウン表示 
                 const hrs = Math.floor(diff / (1000 * 60 * 60));
                 const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 const secs = Math.floor((diff % (1000 * 60)) / 1000);
 
-                if (hrs > 0) {
-                    setTimeLeft(`あと ${hrs}時間${mins}分`);
-                } else if (mins > 0) {
-                    setTimeLeft(`あと ${mins}分${secs}秒`);
-                } else {
-                    setTimeLeft(`あと ${secs}秒`);
-                }
-            };
+                if (hrs > 0) setTimeLeft(`あと ${hrs}時間${mins}分`);
+                else if (mins > 0) setTimeLeft(`あと ${mins}分${secs}秒`);
+                else setTimeLeft(`あと ${secs}秒`);
 
-            updateTimer();
-            const timer = setInterval(updateTimer, 1000);
-            return () => clearInterval(timer);
-        } else if (stream.status === 'live' && stream.scheduledStartTime) {
-            const updateElapsed = () => {
-                const now = new Date().getTime();
-                const start = new Date(stream.scheduledStartTime!).getTime();
-                const diff = now - start;
-
-                if (diff < 0) {
-                    setElapsedTime('0:00');
-                    return;
-                }
-
-                const hrs = Math.floor(diff / (1000 * 60 * 60));
-                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const secs = Math.floor((diff % (1000 * 60)) / 1000);
+                setElapsedTime('');
+            } else {
+                // 経過時間表示（配信開始と推定）
+                setTimeLeft('間もなく開始');
+                const elapsedDiff = now - start;
+                const hrs = Math.floor(elapsedDiff / (1000 * 60 * 60));
+                const mins = Math.floor((elapsedDiff % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((elapsedDiff % (1000 * 60)) / 1000);
 
                 if (hrs > 0) {
                     setElapsedTime(`${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
                 } else {
                     setElapsedTime(`${mins}:${secs.toString().padStart(2, '0')}`);
                 }
-            };
+            }
+        };
 
-            updateElapsed();
-            const timer = setInterval(updateElapsed, 1000); // 1秒ごとに更新
-            return () => clearInterval(timer);
-        }
+        update();
+        const timer = setInterval(update, 1000);
+        return () => clearInterval(timer);
     }, [stream.status, stream.scheduledStartTime]);
 
     const isLive = React.useMemo(() => {
@@ -270,10 +259,7 @@ export default function StreamCard({ stream }: Props) {
                             <Text style={styles.channelName}>{member?.name || stream.channelId}</Text>
                             <Text style={styles.separator}>•</Text>
                             <Text style={styles.time}>
-                                {isLive
-                                    ? `${dateStr} (${elapsedTime})`
-                                    : (stream.status === 'upcoming' && timeLeft ? timeLeft : dateStr)
-                                }
+                                {stream.status === 'upcoming' && timeLeft !== '間もなく開始' ? timeLeft : dateStr}
                             </Text>
                         </View>
                     </View>
