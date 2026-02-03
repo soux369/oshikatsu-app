@@ -40,7 +40,21 @@ export default function MemberListScreen() {
             <View style={styles.itemContainer}>
                 <TouchableOpacity
                     style={styles.memberInfo}
-                    onPress={() => Linking.openURL(`https://www.youtube.com/channel/${item.id}`)}
+                    onPress={async () => {
+                        const url = `https://www.youtube.com/channel/${item.id}`;
+                        try {
+                            const supported = await Linking.canOpenURL(url);
+                            if (supported) {
+                                await Linking.openURL(url);
+                            } else {
+                                console.warn("Don't know how to open URI: " + url);
+                                // Fallback to a standard web URL
+                                await Linking.openURL(`https://www.youtube.com/channel/${item.id}`);
+                            }
+                        } catch (err) {
+                            console.error('An error occurred', err);
+                        }
+                    }}
                     activeOpacity={0.7}
                 >
                     <View style={[styles.avatarPlaceholder, { backgroundColor: item.color }]}>
