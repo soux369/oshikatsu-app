@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "あおぎり配信通知",
+    "name": "あおぎり通知 （非公式）",
     "slug": "aogiri-oshikatsu-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,10 +8,12 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
+      "name": "あおぎり通知",
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.aogirioshikatsuapp"
     },
     "android": {
+      "name": "あおぎり通知",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
