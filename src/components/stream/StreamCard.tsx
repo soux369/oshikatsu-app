@@ -150,7 +150,7 @@ export default function StreamCard({ stream }: Props) {
                 );
             }
             return (
-                <View style={[styles.badge, { backgroundColor: 'rgba(0,0,0,0.8)' }]}>
+                <View style={[styles.badge, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
                     <View style={styles.badgeContent}>
                         <View style={styles.redDot} />
                         <Text style={styles.badgeText}>動画</Text>
@@ -232,7 +232,7 @@ export default function StreamCard({ stream }: Props) {
                         <View style={[
                             styles.avatarPlaceholder,
                             { backgroundColor: isActualEndedStream ? '#444' : member.color },
-                            stream.status !== 'ended' ? styles.avatarLiveBorder : null
+                            stream.status === 'live' && styles.avatarLiveBorder
                         ]}>
                             {stream.channelThumbnailUrl ? (
                                 <Image
