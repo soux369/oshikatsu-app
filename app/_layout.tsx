@@ -18,7 +18,14 @@ export const MaterialTopTabs = withLayoutContext<
     MaterialTopTabNavigationEventMap
 >(Navigator);
 
+import { useEffect } from 'react';
+import { registerForPushNotificationsAsync } from '../src/services/notifications';
+
 export default function Layout() {
+    useEffect(() => {
+        registerForPushNotificationsAsync();
+    }, []);
+
     return (
         <SafeAreaProvider>
             <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.background }} edges={['top']}>

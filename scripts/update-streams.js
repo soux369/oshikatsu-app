@@ -112,12 +112,38 @@ async function update() {
             }
         }
 
+        const GAS_URL = process.env.GAS_URL;
+
+        // Final Sort
         let finalItems = Array.from(uniqueItemsMap.values());
         finalItems.sort((a, b) => {
             const timeA = new Date(a.scheduledStartTime || 0).getTime();
             const timeB = new Date(b.scheduledStartTime || 0).getTime();
             return timeB - timeA;
         });
+
+        // Notification Logic: Detect new LIVE or UPCOMING streams
+        if (GAS_URL) {
+            const newLiveUpcoming = newVerifiedItems.filter(item => item.status === 'live' || item.status === 'upcoming');
+            for (const item of newLiveUpcoming) {
+                const wasKnown = existingItems.find(ex => ex.id === item.id);
+                const isNewlyLive = item.status === 'live' && (!wasKnown || wasKnown.status !== 'live');
+                const isNewlyScheduled = item.status === 'upcoming' && !wasKnown;
+
+                if (isNewlyLive || isNewlyScheduled) {
+                    console.log(`New stream detected: ${item.title}. Notifying GAS...`);
+                    try {
+                        await axios.post(GAS_URL, {
+                            action: 'notify',
+                            title: item.status === 'live' ? '【ライブ開始】' + item.channelTitle : '【配信予約】' + item.channelTitle,
+                            body: item.title
+                        });
+                    } catch (err) {
+                        console.error('GAS Notification failed:', err.message);
+                    }
+                }
+            }
+        }
 
         finalItems = finalItems.slice(0, 500);
         fs.writeFileSync('streams.json', JSON.stringify(finalItems, null, 2));
