@@ -2,7 +2,7 @@ name: Update Streams Data
 
 on:
   schedule:
-    - cron: '*/15 * * * *' # Every 15 minutes (Balanced for quota)
+    - cron: '*/10 * * * *' # Every 10 minutes (Optimal responsiveness/quota)
   workflow_dispatch:
   repository_dispatch:
     types: [trigger-update]

@@ -74,13 +74,14 @@ async function update() {
 
         // 2. Fetch Upcoming Streams (HIGH COST: 100 units)
         // BALANCED: Run search every 30 minutes to prioritize notification while saving quota.
+        // With a 10-min cron, this will trigger at 00, 30 mins each hour.
         const currentMinute = new Date().getUTCMinutes();
         let upcomingIds = [];
-        if (currentMinute % 30 < 15) {
-            console.log('Fetching upcoming streams from Search API (30-min interval notification focus)...');
+        if (currentMinute % 30 < 10) {
+            console.log('Fetching upcoming streams from Search API (30-min heavy sync)...');
             upcomingIds = await fetchUpcomingStreams();
         } else {
-            console.log('Skipping heavy Search API call (15-min minor updates)...');
+            console.log('Skipping heavy Search API call (10-min light sync)...');
         }
         allVideoIds.push(...upcomingIds);
 
