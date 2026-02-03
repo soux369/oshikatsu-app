@@ -43,11 +43,22 @@ export default function VideoListScreen() {
                 return isVideo && isAllowed;
             });
 
-            filtered.sort((a, b) => {
-                const timeA = new Date(a.scheduledStartTime || 0).getTime();
-                const timeB = new Date(b.scheduledStartTime || 0).getTime();
-                return timeB - timeA;
-            });
+            // Sort
+            if (sortOption === 'name') {
+                // Oldest
+                filtered.sort((a, b) => {
+                    const timeA = new Date(a.scheduledStartTime || 0).getTime();
+                    const timeB = new Date(b.scheduledStartTime || 0).getTime();
+                    return timeA - timeB;
+                });
+            } else {
+                // Latest
+                filtered.sort((a, b) => {
+                    const timeA = new Date(a.scheduledStartTime || 0).getTime();
+                    const timeB = new Date(b.scheduledStartTime || 0).getTime();
+                    return timeB - timeA;
+                });
+            }
 
             setAllVideos(filtered);
         } catch (error) {
@@ -171,6 +182,36 @@ export default function VideoListScreen() {
                 <Ionicons name="refresh-circle" size={48} color="#222" />
             </Animated.View>
 
+            <View style={styles.headerControls}>
+                <View style={styles.searchRow}>
+                    <View style={styles.searchContainer}>
+                        <Ionicons name="search" size={16} color={COLORS.textSecondary} style={{ marginRight: 8 }} />
+                        <TextInput
+                            style={styles.searchInput}
+                            placeholder="検索..."
+                            placeholderTextColor={COLORS.textSecondary}
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
+                            clearButtonMode="while-editing"
+                        />
+                    </View>
+                    <TouchableOpacity
+                        style={styles.sortToggle}
+                        onPress={() => setSortOption(sortOption === 'date' ? 'name' : 'date')}
+                        activeOpacity={0.7}
+                    >
+                        <Ionicons
+                            name={sortOption === 'date' ? "time-outline" : "calendar-outline"}
+                            size={18}
+                            color="#fff"
+                        />
+                        <Text style={styles.sortToggleText}>
+                            {sortOption === 'date' ? '最新' : '古い'}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+
             <Animated.FlatList
                 data={videos}
                 keyExtractor={(item) => item.id}
@@ -179,35 +220,6 @@ export default function VideoListScreen() {
                     styles.listContent,
                     { backgroundColor: COLORS.background }
                 ]}
-                ListHeaderComponent={
-                    <View style={styles.headerControls}>
-                        <View style={styles.searchContainer}>
-                            <Ionicons name="search" size={18} color={COLORS.textSecondary} style={{ marginRight: 8 }} />
-                            <TextInput
-                                style={styles.searchInput}
-                                placeholder="検索（タイトル・名前）"
-                                placeholderTextColor={COLORS.textSecondary}
-                                value={searchQuery}
-                                onChangeText={setSearchQuery}
-                                clearButtonMode="while-editing"
-                            />
-                        </View>
-                        <View style={styles.sortContainer}>
-                            <TouchableOpacity
-                                style={[styles.sortButton, sortOption === 'date' && styles.sortButtonActive]}
-                                onPress={() => setSortOption('date')}
-                            >
-                                <Text style={[styles.sortButtonText, sortOption === 'date' && styles.sortButtonTextActive]}>日付順</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[styles.sortButton, sortOption === 'name' && styles.sortButtonActive]}
-                                onPress={() => setSortOption('name')}
-                            >
-                                <Text style={[styles.sortButtonText, sortOption === 'name' && styles.sortButtonTextActive]}>名前順</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                }
                 onScroll={Animated.event(
                     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
                     { useNativeDriver: true }
@@ -292,46 +304,43 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     headerControls: {
-        paddingHorizontal: 16,
-        paddingBottom: 8,
+        paddingHorizontal: 12,
+        paddingTop: 8,
+        paddingBottom: 4,
+        zIndex: 10,
+    },
+    searchRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
     },
     searchContainer: {
+        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#1a1a1a',
-        borderRadius: 10,
+        borderRadius: 12,
         paddingHorizontal: 12,
         height: 40,
-        marginBottom: 10,
         borderWidth: 1,
         borderColor: '#333',
     },
     searchInput: {
         flex: 1,
         color: COLORS.textPrimary,
-        fontSize: 14,
+        fontSize: 15,
     },
-    sortContainer: {
+    sortToggle: {
         flexDirection: 'row',
-        gap: 8,
-    },
-    sortButton: {
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 20,
-        backgroundColor: '#1a1a1a',
-        borderWidth: 1,
-        borderColor: '#333',
-    },
-    sortButtonActive: {
+        alignItems: 'center',
         backgroundColor: COLORS.primary,
-        borderColor: COLORS.primary,
+        borderRadius: 12,
+        paddingHorizontal: 12,
+        height: 40,
+        gap: 4,
     },
-    sortButtonText: {
-        fontSize: 12,
-        color: COLORS.textSecondary,
-    },
-    sortButtonTextActive: {
+    sortToggleText: {
+        fontSize: 13,
         color: '#fff',
         fontWeight: 'bold',
     },

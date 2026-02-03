@@ -98,9 +98,8 @@ export default function StreamCard({ stream }: Props) {
     const getStatusBadge = () => {
         if (isShort) {
             return (
-                <View style={[styles.badge, { backgroundColor: '#FF0000', flexDirection: 'row', alignItems: 'center' }]}>
-                    <MaterialCommunityIcons name={"youtube-shorts" as any} size={14} color="white" style={{ marginRight: 4 }} />
-                    <Text style={styles.badgeText}>ショート</Text>
+                <View style={[styles.badge, { backgroundColor: '#FF0000', paddingHorizontal: 6 }]}>
+                    <MaterialCommunityIcons name={"play-box-multiple" as any} size={16} color="white" />
                 </View>
             );
         }
