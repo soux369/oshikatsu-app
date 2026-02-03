@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Switch, Image } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Switch, Image, TouchableOpacity, Linking } from 'react-native';
 import { AOGIRI_MEMBERS, Member } from '../src/constants/members';
 import { getMemberSettings, saveMemberSettings, MemberSettingsMap } from '../src/services/memberSettings';
 import { getStreams, StreamInfo } from '../src/api/streams';
@@ -38,7 +38,11 @@ export default function MemberListScreen() {
 
         return (
             <View style={styles.itemContainer}>
-                <View style={styles.memberInfo}>
+                <TouchableOpacity
+                    style={styles.memberInfo}
+                    onPress={() => Linking.openURL(`https://www.youtube.com/channel/${item.id}`)}
+                    activeOpacity={0.7}
+                >
                     <View style={[styles.avatarPlaceholder, { backgroundColor: item.color }]}>
                         {stream?.channelThumbnailUrl ? (
                             <Image source={{ uri: stream.channelThumbnailUrl }} style={styles.avatarImage} />
@@ -48,8 +52,9 @@ export default function MemberListScreen() {
                     </View>
                     <View>
                         <Text style={styles.memberName}>{item.name}</Text>
+                        <Text style={styles.linkHint}>チャンネルを開く</Text>
                     </View>
-                </View>
+                </TouchableOpacity>
                 <View style={styles.switchGroup}>
                     <View style={styles.switchItem}>
                         <Text style={styles.switchLabel}>表示</Text>
@@ -139,6 +144,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: COLORS.textPrimary,
         fontWeight: '600',
+    },
+    linkHint: {
+        fontSize: 10,
+        color: COLORS.primary,
+        marginTop: 2,
     },
     disclaimer: {
         fontSize: 10,

@@ -122,7 +122,7 @@ export default function StreamCard({ stream }: Props) {
                     {member && (
                         <View style={[
                             styles.avatarPlaceholder,
-                            { backgroundColor: member.color },
+                            { backgroundColor: isActualEndedStream ? '#444' : member.color },
                             stream.status === 'live' && styles.avatarLiveBorder
                         ]}>
                             {stream.channelThumbnailUrl ? (
@@ -136,7 +136,7 @@ export default function StreamCard({ stream }: Props) {
                             ) : (
                                 <Text style={[
                                     styles.avatarText,
-                                    { color: getAvatarTextColor(member.color) },
+                                    { color: isActualEndedStream ? '#888' : getAvatarTextColor(member.color) },
                                     isActualEndedStream && styles.avatarEnded
                                 ]}>
                                     {member.name[0]}
