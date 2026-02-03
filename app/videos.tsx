@@ -53,7 +53,7 @@ export default function VideoListScreen() {
 
     const loadVideos = useCallback(async (force = false) => {
         try {
-            if (!force && videos.length === 0) {
+            if (!force && rawStreams.length === 0) {
                 setLoading(true);
             }
 
@@ -94,7 +94,7 @@ export default function VideoListScreen() {
             setLoading(false);
             setRefreshing(false);
         }
-    }, [videos.length]);
+    }, []);
 
     useFocusEffect(
         useCallback(() => {
@@ -188,7 +188,7 @@ export default function VideoListScreen() {
         extrapolate: 'clamp',
     });
 
-    if (loading && videos.length === 0) {
+    if (loading && rawStreams.length === 0) {
         return (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color={COLORS.primary} />
@@ -217,19 +217,19 @@ export default function VideoListScreen() {
                 <View style={styles.searchRow}>
                     <SearchBar onChange={setSearchQuery} />
                     <TouchableOpacity
-                        style={[styles.sortToggle, sortOption === 'oldest' && styles.sortToggleActive]}
+                        style={styles.sortToggle}
                         onPress={() => setSortOption(sortOption === 'latest' ? 'oldest' : 'latest')}
                         activeOpacity={0.8}
                     >
                         <Ionicons
                             name="chevron-up"
                             size={14}
-                            color={sortOption === 'oldest' ? "#fff" : "rgba(255,255,255,0.4)"}
+                            color={sortOption === 'oldest' ? "#fff" : "rgba(255,255,255,0.2)"}
                         />
                         <Ionicons
                             name="chevron-down"
                             size={14}
-                            color={sortOption === 'latest' ? "#fff" : "rgba(255,255,255,0.4)"}
+                            color={sortOption === 'latest' ? "#fff" : "rgba(255,255,255,0.2)"}
                         />
                         <Text style={styles.sortToggleText}>
                             {sortOption === 'latest' ? '最新' : '古い'}
@@ -359,17 +359,13 @@ const styles = StyleSheet.create({
     sortToggle: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#000',
+        backgroundColor: '#1a1a1a',
         borderRadius: 12,
         paddingHorizontal: 10,
         height: 40,
         gap: 0,
         borderWidth: 1,
         borderColor: '#333',
-    },
-    sortToggleActive: {
-        borderColor: '#666',
-        backgroundColor: '#222',
     },
     sortToggleText: {
         fontSize: 12,
