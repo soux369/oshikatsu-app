@@ -9,6 +9,14 @@ import { useNotifications } from '../src/hooks/useNotifications';
 import { COLORS } from '../src/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 
+const normalizeText = (text: string) => {
+    return text
+        .replace(/[ァ-ン]/g, s => String.fromCharCode(s.charCodeAt(0) - 0x60)) // Katakana to Hiragana
+        .replace(/[Ａ-Ｚａ-ｚ０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xfee0)) // Full-width to Half-width
+        .replace(/[ー-\s]/g, '') // Remove long vowels, hyphens, spaces
+        .toLowerCase();
+};
+
 const SearchBar = React.memo(({ onChange }: { onChange: (text: string) => void }) => {
     const [localValue, setLocalValue] = useState('');
 
@@ -31,7 +39,11 @@ const SearchBar = React.memo(({ onChange }: { onChange: (text: string) => void }
                 clearButtonMode="while-editing"
                 autoCapitalize="none"
                 autoCorrect={false}
-                blurOnSubmit={false}
+                blurOnSubmit={true}
+                returnKeyType="search"
+                onSubmitEditing={(e) => {
+                    onChange(e.nativeEvent.text);
+                }}
             />
         </View>
     );
@@ -131,10 +143,10 @@ export default function StreamListScreen() {
 
         // Search
         if (searchQuery) {
-            const query = searchQuery.toLowerCase();
+            const query = normalizeText(searchQuery);
             filtered = filtered.filter(s =>
-                s.title.toLowerCase().includes(query) ||
-                s.channelTitle.toLowerCase().includes(query)
+                normalizeText(s.title).includes(query) ||
+                normalizeText(s.channelTitle).includes(query)
             );
         }
 
@@ -282,19 +294,8 @@ export default function StreamListScreen() {
                         progressBackgroundColor="transparent"
                     />
                 }
-                ListFooterComponent={
-                    hasMore ? (
-                        <TouchableOpacity
-                            style={styles.moreButton}
-                            onPress={loadMore}
-                            activeOpacity={0.8}
-                        >
-                            <Text style={styles.moreButtonText}>さらに10件表示</Text>
-                        </TouchableOpacity>
-                    ) : (
-                        allData.ended.length > 0 ? <View style={{ height: 40 }} /> : null
-                    )
-                }
+                onEndReached={loadMore}
+                onEndReachedThreshold={0.5}
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         <Text style={styles.emptyText}>予定されている配信はありません</Text>
@@ -335,16 +336,6 @@ const styles = StyleSheet.create({
     emptyText: {
         color: COLORS.textSecondary,
         fontSize: 14,
-    },
-    moreButton: {
-        paddingVertical: 14,
-        alignItems: 'center',
-        backgroundColor: '#262626',
-        marginHorizontal: 16,
-        marginVertical: 12,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: '#333',
     },
     moreButtonText: {
         color: '#eee',

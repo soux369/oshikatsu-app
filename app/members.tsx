@@ -32,6 +32,20 @@ export default function MemberListScreen() {
         await saveMemberSettings(newSettings);
     };
 
+    const bulkUpdate = async (key: 'display' | 'notify', type: 'all' | 'none' | 'invert') => {
+        const newSettings = { ...settings };
+        AOGIRI_MEMBERS.forEach(member => {
+            const current = newSettings[member.id] || { display: true, notify: true };
+            let newValue = true;
+            if (type === 'none') newValue = false;
+            else if (type === 'invert') newValue = !current[key];
+
+            newSettings[member.id] = { ...current, [key]: newValue };
+        });
+        setSettings(newSettings);
+        await saveMemberSettings(newSettings);
+    };
+
     const renderItem = ({ item }: { item: Member }) => {
         const pref = settings[item.id] || { display: true, notify: true };
         const stream = streams.find(s => s.channelId === item.id);
@@ -106,6 +120,35 @@ export default function MemberListScreen() {
                             <Text style={styles.headerDisclaimer}>
                                 ※本アプリは「あおぎり高校」ファンの非公式応援アプリです。公式とは一切関係ありません。
                             </Text>
+                        </View>
+
+                        <View style={styles.bulkActionRow}>
+                            <Text style={styles.bulkLabel}>一括設定:</Text>
+                            <View style={styles.bulkButtons}>
+                                <TouchableOpacity style={styles.bulkBtn} onPress={() => bulkUpdate('display', 'all')}>
+                                    <Text style={styles.bulkBtnText}>全て表示</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.bulkBtn} onPress={() => bulkUpdate('display', 'none')}>
+                                    <Text style={styles.bulkBtnText}>解除</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.bulkBtn} onPress={() => bulkUpdate('display', 'invert')}>
+                                    <Text style={styles.bulkBtnText}>反転</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                        <View style={styles.bulkActionRow}>
+                            <Text style={styles.bulkLabel}>通知設定:</Text>
+                            <View style={styles.bulkButtons}>
+                                <TouchableOpacity style={[styles.bulkBtn, { borderColor: '#FFC107' }]} onPress={() => bulkUpdate('notify', 'all')}>
+                                    <Text style={[styles.bulkBtnText, { color: '#FFC107' }]}>全て通知</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={[styles.bulkBtn, { borderColor: '#FFC107' }]} onPress={() => bulkUpdate('notify', 'none')}>
+                                    <Text style={[styles.bulkBtnText, { color: '#FFC107' }]}>解除</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={[styles.bulkBtn, { borderColor: '#FFC107' }]} onPress={() => bulkUpdate('notify', 'invert')}>
+                                    <Text style={[styles.bulkBtnText, { color: '#FFC107' }]}>反転</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </View>
                 }
@@ -208,5 +251,35 @@ const styles = StyleSheet.create({
         color: COLORS.textSecondary,
         lineHeight: 18,
         textAlign: 'center',
+    },
+    bulkActionRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 12,
+        paddingHorizontal: 4,
+    },
+    bulkLabel: {
+        color: COLORS.textSecondary,
+        fontSize: 12,
+        fontWeight: 'bold',
+        width: 60,
+    },
+    bulkButtons: {
+        flex: 1,
+        flexDirection: 'row',
+        gap: 8,
+    },
+    bulkBtn: {
+        paddingVertical: 6,
+        paddingHorizontal: 10,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: COLORS.primary,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    },
+    bulkBtnText: {
+        fontSize: 11,
+        color: COLORS.primary,
+        fontWeight: 'bold',
     },
 });
