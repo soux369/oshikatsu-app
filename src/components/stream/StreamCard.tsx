@@ -113,6 +113,13 @@ export default function StreamCard({ stream }: Props) {
             );
         }
         if (stream.type === 'video') {
+            if (stream.status !== 'ended') {
+                return (
+                    <View style={[styles.badge, { backgroundColor: '#FF5722' }]}>
+                        <Text style={styles.badgeText}>プレミア公開</Text>
+                    </View>
+                );
+            }
             return (
                 <View style={[styles.badge, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
                     <Text style={styles.badgeText}>動画</Text>

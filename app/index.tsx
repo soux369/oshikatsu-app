@@ -124,9 +124,10 @@ export default function StreamListScreen() {
 
             const filtered = data.filter(s => {
                 const isStream = s.type === 'stream' || !s.type;
+                const isPremiere = s.type === 'video' && (s.status === 'live' || s.status === 'upcoming');
                 const pref = settings[s.channelId];
                 const isAllowed = pref ? pref.display : true;
-                return isStream && isAllowed;
+                return (isStream || isPremiere) && isAllowed;
             });
 
             const liveAndUpcoming = filtered.filter(s => s.status === 'live' || s.status === 'upcoming');
@@ -333,8 +334,8 @@ export default function StreamListScreen() {
                             const isAtBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height;
                             const pullUpDistance = (layoutMeasurement.height + contentOffset.y) - contentSize.height;
 
-                            // Trigger load more only on "strong" overscroll at bottom (60px)
-                            if (isAtBottom && pullUpDistance > 60 && hasMore && !loading) {
+                            // Trigger load more only on "VERY strong" overscroll at bottom (120px)
+                            if (isAtBottom && pullUpDistance > 120 && hasMore && !loading) {
                                 loadMore();
                             }
                         }

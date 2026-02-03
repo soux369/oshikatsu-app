@@ -118,10 +118,10 @@ export default function VideoListScreen() {
             setRawStreams(data);
 
             const filtered = data.filter(s => {
-                const isVideo = s.type === 'video';
+                const isEndedVideo = s.type === 'video' && s.status === 'ended';
                 const pref = settings[s.channelId];
                 const isAllowed = pref ? pref.display : true;
-                return isVideo && isAllowed;
+                return isEndedVideo && isAllowed;
             });
 
             // Sort
@@ -308,7 +308,7 @@ export default function VideoListScreen() {
                             const isAtBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height;
                             const pullUpDistance = (layoutMeasurement.height + contentOffset.y) - contentSize.height;
 
-                            if (isAtBottom && pullUpDistance > 60 && hasMore && !loading) {
+                            if (isAtBottom && pullUpDistance > 120 && hasMore && !loading) {
                                 loadMore();
                             }
                         }
