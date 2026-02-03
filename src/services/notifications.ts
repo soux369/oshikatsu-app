@@ -1,6 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
-import { Platform } from 'react-native';
+import { Platform, Alert } from 'react-native';
 import Constants from 'expo-constants';
 import axios from 'axios';
 
@@ -53,8 +53,10 @@ export async function registerForPushNotificationsAsync() {
                     token: token
                 });
                 console.log('Token registered to GAS');
+                Alert.alert('通知設定', 'スマホの登録が完了しました！これで通知が届きます。');
             } catch (e) {
                 console.error('Failed to register token to GAS', e);
+                Alert.alert('通知設定エラー', 'GASへの登録に失敗しました。URLを確認してください。');
             }
         }
     } else {
