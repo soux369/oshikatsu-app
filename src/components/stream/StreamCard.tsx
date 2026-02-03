@@ -12,36 +12,61 @@ interface Props {
 export default function StreamCard({ stream }: Props) {
     const member = getMemberById(stream.channelId);
     const [timeLeft, setTimeLeft] = React.useState('');
+    const [elapsedTime, setElapsedTime] = React.useState('');
 
     React.useEffect(() => {
-        if (stream.status !== 'upcoming' || !stream.scheduledStartTime) return;
+        if (stream.status === 'upcoming' && stream.scheduledStartTime) {
+            const updateTimer = () => {
+                const now = new Date().getTime();
+                const start = new Date(stream.scheduledStartTime!).getTime();
+                const diff = start - now;
 
-        const updateTimer = () => {
-            const now = new Date().getTime();
-            const start = new Date(stream.scheduledStartTime!).getTime();
-            const diff = start - now;
+                if (diff <= 0) {
+                    setTimeLeft('間もなく開始');
+                    return;
+                }
 
-            if (diff <= 0) {
-                setTimeLeft('間もなく開始');
-                return;
-            }
+                const hrs = Math.floor(diff / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((diff % (1000 * 60)) / 1000);
 
-            const hrs = Math.floor(diff / (1000 * 60 * 60));
-            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+                if (hrs > 0) {
+                    setTimeLeft(`あと ${hrs}時間${mins}分`);
+                } else if (mins > 0) {
+                    setTimeLeft(`あと ${mins}分${secs}秒`);
+                } else {
+                    setTimeLeft(`あと ${secs}秒`);
+                }
+            };
 
-            if (hrs > 0) {
-                setTimeLeft(`あと ${hrs}時間${mins}分`);
-            } else if (mins > 0) {
-                setTimeLeft(`あと ${mins}分${secs}秒`);
-            } else {
-                setTimeLeft(`あと ${secs}秒`);
-            }
-        };
+            updateTimer();
+            const timer = setInterval(updateTimer, 1000);
+            return () => clearInterval(timer);
+        } else if (stream.status === 'live' && stream.scheduledStartTime) {
+            const updateElapsed = () => {
+                const now = new Date().getTime();
+                const start = new Date(stream.scheduledStartTime!).getTime();
+                const diff = now - start;
 
-        updateTimer();
-        const timer = setInterval(updateTimer, 1000);
-        return () => clearInterval(timer);
+                if (diff < 0) {
+                    setElapsedTime('開始直後');
+                    return;
+                }
+
+                const hrs = Math.floor(diff / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+                if (hrs > 0) {
+                    setElapsedTime(`${hrs}時間${mins}分経過`);
+                } else {
+                    setElapsedTime(`${mins}分経過`);
+                }
+            };
+
+            updateElapsed();
+            const timer = setInterval(updateElapsed, 30000); // 30秒ごとに更新
+            return () => clearInterval(timer);
+        }
     }, [stream.status, stream.scheduledStartTime]);
 
     const openStream = () => {
@@ -116,20 +141,29 @@ export default function StreamCard({ stream }: Props) {
             if (stream.status !== 'ended') {
                 return (
                     <View style={[styles.badge, { backgroundColor: '#FF5722' }]}>
-                        <Text style={styles.badgeText}>プレミア公開</Text>
+                        <View style={styles.badgeContent}>
+                            <View style={styles.redDot} />
+                            <Text style={styles.badgeText}>プレミア公開</Text>
+                        </View>
                     </View>
                 );
             }
             return (
                 <View style={[styles.badge, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
-                    <Text style={styles.badgeText}>動画</Text>
+                    <View style={styles.badgeContent}>
+                        <View style={styles.redDot} />
+                        <Text style={styles.badgeText}>動画</Text>
+                    </View>
                 </View>
             );
         }
         if (stream.status === 'live') {
             return (
                 <View style={[styles.badge, { backgroundColor: '#cc0000' }]}>
-                    <Text style={styles.badgeText}>ライブ</Text>
+                    <View style={styles.badgeContent}>
+                        <View style={styles.redDot} />
+                        <Text style={styles.badgeText}>ライブ</Text>
+                    </View>
                 </View>
             );
         } else if (stream.status === 'ended') {
@@ -165,16 +199,26 @@ export default function StreamCard({ stream }: Props) {
             onPress={openStream}
             activeOpacity={0.7}
         >
-            <View>
+            <View style={[stream.status === 'live' && styles.liveThumbnailContainer]}>
                 <Image
                     source={{ uri: stream.thumbnailUrl }}
-                    style={[styles.thumbnail, isActualEndedStream && styles.thumbnailEnded]}
+                    style={[
+                        styles.thumbnail,
+                        isActualEndedStream && styles.thumbnailEnded,
+                        stream.status === 'live' && styles.liveThumbnail
+                    ]}
                 />
                 <View style={styles.bottomLeftBadgeContainer}>
-                    {durationStr !== '' && (
-                        <View style={[styles.badge, styles.durationBadge]}>
-                            <Text style={styles.badgeText}>{durationStr}</Text>
+                    {stream.status === 'live' && elapsedTime ? (
+                        <View style={[styles.badge, styles.liveElapsedBadge]}>
+                            <Text style={styles.badgeText}>{elapsedTime}</Text>
                         </View>
+                    ) : (
+                        durationStr !== '' && (
+                            <View style={[styles.badge, styles.durationBadge]}>
+                                <Text style={styles.badgeText}>{durationStr}</Text>
+                            </View>
+                        )
                     )}
                 </View>
                 <View style={styles.bottomRightBadgeContainer}>
@@ -187,7 +231,7 @@ export default function StreamCard({ stream }: Props) {
                         <View style={[
                             styles.avatarPlaceholder,
                             { backgroundColor: isActualEndedStream ? '#444' : member.color },
-                            stream.status === 'live' && styles.avatarLiveBorder
+                            (stream.status === 'live' || stream.type === 'video') && styles.avatarLiveBorder
                         ]}>
                             {stream.channelThumbnailUrl ? (
                                 <Image
@@ -336,5 +380,28 @@ const styles = StyleSheet.create({
     time: {
         fontSize: 13,
         color: COLORS.textSecondary,
+    },
+    badgeContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    redDot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: '#FF0000',
+        marginRight: 4,
+    },
+    liveThumbnailContainer: {
+        padding: 2, // 赤い線の太さ分だけ余白を作る
+        backgroundColor: '#FF0000',
+        borderRadius: 12,
+        overflow: 'hidden',
+    },
+    liveThumbnail: {
+        borderRadius: 10,
+    },
+    liveElapsedBadge: {
+        backgroundColor: 'rgba(204, 0, 0, 0.85)',
     },
 });
