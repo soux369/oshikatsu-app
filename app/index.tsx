@@ -150,6 +150,14 @@ export default function StreamListScreen() {
     useFocusEffect(
         useCallback(() => {
             loadStreams();
+
+            // 5分おきに自動更新（アプリを開いている間）
+            const interval = setInterval(() => {
+                console.log('Auto-refreshing stream list...');
+                loadStreams();
+            }, 5 * 60 * 1000);
+
+            return () => clearInterval(interval);
         }, [loadStreams])
     );
 

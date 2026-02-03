@@ -162,9 +162,9 @@ export default function VideoListScreen() {
     // Auto-refresh every 10 minutes (Silent refresh)
     useEffect(() => {
         const interval = setInterval(() => {
-            console.log('Auto-refreshing videos...');
+            console.log('Auto-refreshing video list...');
             loadVideos(true);
-        }, 10 * 60 * 1000);
+        }, 5 * 60 * 1000);
 
         return () => clearInterval(interval);
     }, [loadVideos]);
