@@ -194,26 +194,32 @@ export default function StreamListScreen() {
             );
         }
 
-        // Sort
+        const endedFiltered = filtered.filter(s => s.status === 'ended');
+        const liveUpcomingFiltered = filtered.filter(s => s.status !== 'ended');
+
+        // Always sort Live/Upcoming by earliest start time first
+        liveUpcomingFiltered.sort((a, b) => {
+            const timeA = new Date(a.scheduledStartTime || 0).getTime();
+            const timeB = new Date(b.scheduledStartTime || 0).getTime();
+            return timeA - timeB;
+        });
+
+        // Sort Ended streams based on user selection
         if (sortOption === 'oldest') {
-            filtered.sort((a, b) => {
+            endedFiltered.sort((a, b) => {
                 const timeA = new Date(a.scheduledStartTime || 0).getTime();
                 const timeB = new Date(b.scheduledStartTime || 0).getTime();
                 return timeA - timeB;
             });
         } else {
-            // Latest
-            filtered.sort((a, b) => {
+            endedFiltered.sort((a, b) => {
                 const timeA = new Date(a.scheduledStartTime || 0).getTime();
                 const timeB = new Date(b.scheduledStartTime || 0).getTime();
                 return timeB - timeA;
             });
         }
 
-        const displayEndedFiltered = filtered.filter(s => s.status === 'ended');
-        const liveUpcomingFiltered = filtered.filter(s => s.status !== 'ended');
-
-        setStreams([...liveUpcomingFiltered, ...displayEndedFiltered.slice(0, visibleCount)]);
+        setStreams([...liveUpcomingFiltered, ...endedFiltered.slice(0, visibleCount)]);
     }, [allData, visibleCount, searchQuery, sortOption]);
 
     useEffect(() => {
