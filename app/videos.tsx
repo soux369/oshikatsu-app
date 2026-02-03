@@ -122,10 +122,10 @@ export default function VideoListScreen() {
             setRawStreams(data);
 
             const filtered = data.filter(s => {
-                const isEndedVideo = s.type === 'video' && s.status === 'ended';
+                const isVideo = s.type === 'video' && (s.status === 'ended' || s.status === 'live');
                 const pref = settings[s.channelId];
                 const isAllowed = pref ? pref.display : true;
-                return isEndedVideo && isAllowed;
+                return isVideo && isAllowed;
             });
 
             // Sort
