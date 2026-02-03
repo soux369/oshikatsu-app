@@ -70,6 +70,12 @@ export default function StreamCard({ stream }: Props) {
         }
     }, [stream.status, stream.scheduledStartTime]);
 
+    const isLive = React.useMemo(() => {
+        if (stream.status === 'live') return true;
+        if (stream.status === 'upcoming' && timeLeft === '間もなく開始') return true;
+        return false;
+    }, [stream.status, timeLeft]);
+
     const openStream = () => {
         Linking.openURL(`https://www.youtube.com/watch?v=${stream.id}`);
     };
@@ -158,7 +164,7 @@ export default function StreamCard({ stream }: Props) {
                 </View>
             );
         }
-        if (stream.status === 'live') {
+        if (isLive) {
             return (
                 <View style={[styles.badge, { backgroundColor: '#cc0000' }]}>
                     <View style={styles.badgeContent}>
@@ -200,17 +206,17 @@ export default function StreamCard({ stream }: Props) {
             onPress={openStream}
             activeOpacity={0.7}
         >
-            <View style={[stream.status === 'live' && styles.liveThumbnailContainer]}>
+            <View style={[isLive && styles.liveThumbnailContainer]}>
                 <Image
                     source={{ uri: stream.thumbnailUrl }}
                     style={[
                         styles.thumbnail,
                         isActualEndedStream && styles.thumbnailEnded,
-                        stream.status === 'live' && styles.liveThumbnail
+                        isLive && styles.liveThumbnail
                     ]}
                 />
                 <View style={styles.bottomLeftBadgeContainer}>
-                    {stream.status === 'live' && elapsedTime ? (
+                    {isLive && elapsedTime ? (
                         <View style={[styles.badge, styles.liveElapsedBadge]}>
                             <Text style={styles.badgeText}>{elapsedTime}</Text>
                         </View>
@@ -232,7 +238,7 @@ export default function StreamCard({ stream }: Props) {
                         <View style={[
                             styles.avatarPlaceholder,
                             { backgroundColor: isActualEndedStream ? '#444' : member.color },
-                            stream.status === 'live' && styles.avatarLiveBorder
+                            isLive && styles.avatarLiveBorder
                         ]}>
                             {stream.channelThumbnailUrl ? (
                                 <Image

@@ -8,8 +8,28 @@ import { StreamInfo } from '../types/youtube';
 
 const NOTIFIED_IDS_KEY = 'NOTIFIED_CONTENT_IDS';
 
-export const useNotifications = (streams: StreamInfo[]) => {
+export const useNotifications = (streams: StreamInfo[], onRefresh?: () => void) => {
     const isFirstRun = useRef(true);
+
+    // Listen for notification received while in foreground
+    useEffect(() => {
+        const subscription = Notifications.addNotificationReceivedListener(notification => {
+            console.log('Notification received in foreground, refreshing data...');
+            if (onRefresh) onRefresh();
+        });
+        return () => subscription.remove();
+    }, [onRefresh]);
+
+    // Listener for notification clicks
+    useEffect(() => {
+        const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+            const url = response.notification.request.content.data?.url;
+            if (typeof url === 'string') {
+                Linking.openURL(url);
+            }
+        });
+        return () => subscription.remove();
+    }, []);
 
     useEffect(() => {
         const setup = async () => {
@@ -76,15 +96,4 @@ export const useNotifications = (streams: StreamInfo[]) => {
             await AsyncStorage.setItem(NOTIFIED_IDS_KEY, JSON.stringify(allNotified));
         }
     };
-
-    // Listener for notification clicks
-    useEffect(() => {
-        const subscription = Notifications.addNotificationResponseReceivedListener(response => {
-            const url = response.notification.request.content.data?.url;
-            if (typeof url === 'string') {
-                Linking.openURL(url);
-            }
-        });
-        return () => subscription.remove();
-    }, []);
 };

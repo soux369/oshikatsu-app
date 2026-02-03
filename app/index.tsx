@@ -108,7 +108,7 @@ export default function StreamListScreen() {
     const scrollY = useRef(new Animated.Value(0)).current;
     const spinAnim = useRef(new Animated.Value(0)).current;
 
-    useNotifications(rawStreams);
+    useNotifications(rawStreams, () => loadStreams(true));
 
     const loadStreams = useCallback(async (force = false) => {
         try {
