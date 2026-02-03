@@ -5,11 +5,13 @@ import { useFocusEffect } from 'expo-router';
 import { getStreams, StreamInfo } from '../src/api/streams';
 import { getMemberSettings } from '../src/services/memberSettings';
 import StreamCard from '../src/components/stream/StreamCard';
+import { useNotifications } from '../src/hooks/useNotifications';
 import { COLORS } from '../src/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function StreamListScreen() {
     const [streams, setStreams] = useState<StreamInfo[]>([]);
+    const [rawStreams, setRawStreams] = useState<StreamInfo[]>([]);
     const [allData, setAllData] = useState<{ liveAndUpcoming: StreamInfo[], ended: StreamInfo[] }>({ liveAndUpcoming: [], ended: [] });
     const [visibleCount, setVisibleCount] = useState(6);
     const [loading, setLoading] = useState(true);
@@ -17,6 +19,8 @@ export default function StreamListScreen() {
 
     const scrollY = useRef(new Animated.Value(0)).current;
     const spinAnim = useRef(new Animated.Value(0)).current;
+
+    useNotifications(rawStreams);
 
     const loadStreams = useCallback(async (force = false) => {
         try {
@@ -29,6 +33,8 @@ export default function StreamListScreen() {
                 getStreams(force),
                 getMemberSettings()
             ]);
+
+            setRawStreams(data);
 
             const filtered = data.filter(s => {
                 const isStream = s.type === 'stream' || !s.type;

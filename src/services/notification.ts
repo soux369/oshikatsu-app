@@ -8,6 +8,8 @@ Notifications.setNotificationHandler({
         shouldShowAlert: true,
         shouldPlaySound: true,
         shouldSetBadge: false,
+        shouldShowBanner: true,
+        shouldShowList: true,
     }),
 });
 
@@ -45,11 +47,30 @@ export const scheduleStreamNotification = async (stream: StreamInfo, minutesBefo
             data: { url: `https://www.youtube.com/watch?v=${stream.id}` },
         },
         trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.DATE,
             date: new Date(triggerTime),
-        },
+        } as any, // Bypass TS complexity for now if needed, but 'date' + 'type' is usually correct 
+
     });
 
     return identifier;
+};
+
+/**
+ * Trigger an immediate notification for newly added content
+ */
+export const notifyNewContent = async (stream: StreamInfo) => {
+    const isStream = stream.type === 'stream';
+    const typeLabel = isStream ? '配信予定' : '新着動画';
+
+    await Notifications.scheduleNotificationAsync({
+        content: {
+            title: `【${typeLabel}】${stream.channelTitle}`,
+            body: stream.title,
+            data: { url: `https://www.youtube.com/watch?v=${stream.id}` },
+        },
+        trigger: null, // trigger immediately
+    });
 };
 
 /**

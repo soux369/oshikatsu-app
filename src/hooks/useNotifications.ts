@@ -1,11 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import * as Notifications from 'expo-notifications';
 import * as Linking from 'expo-linking';
-import { requestNotificationPermissions, scheduleStreamNotification, cancelAllNotifications } from '../services/notification';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { requestNotificationPermissions, scheduleStreamNotification, cancelAllNotifications, notifyNewContent } from '../services/notification';
 import { getMemberSettings } from '../services/memberSettings';
 import { StreamInfo } from '../types/youtube';
 
+const NOTIFIED_IDS_KEY = 'NOTIFIED_CONTENT_IDS';
+
 export const useNotifications = (streams: StreamInfo[]) => {
+    const isFirstRun = useRef(true);
+
     useEffect(() => {
         const setup = async () => {
             const granted = await requestNotificationPermissions();
@@ -19,20 +24,56 @@ export const useNotifications = (streams: StreamInfo[]) => {
     }, [streams]);
 
     const syncNotifications = async (currentStreams: StreamInfo[]) => {
-        // Strategy: Cancel all and reschedule based on current filtered streams
-        // This is simple but effective for a prototype
+        // Strategy for Scheduled Reminders: Cancel all and reschedule
+        // (Simple but effective for upcoming start times)
         await cancelAllNotifications();
 
         const settings = await getMemberSettings();
-        const upcomingStreams = currentStreams.filter(s => s.status === 'upcoming');
 
+        // --- Part 1: Scheduled Reminders (Stream Start) ---
+        const upcomingStreams = currentStreams.filter(s => s.status === 'upcoming');
         for (const stream of upcomingStreams) {
-            // Default to ON if not set specifically
             const pref = settings[stream.channelId];
-            const isEnabled = pref ? pref.notify : true; // Default true
+            const isEnabled = pref ? pref.notify : true;
             if (isEnabled) {
                 await scheduleStreamNotification(stream);
             }
+        }
+
+        // --- Part 2: New Content Notifications (New discovery) ---
+        // We only notify for NEW entries that we haven't seen before.
+        // We skip this check on the very first run of the app to avoid spamming 50+ notifications.
+        const notifiedStr = await AsyncStorage.getItem(NOTIFIED_IDS_KEY);
+        const notifiedIds = notifiedStr ? JSON.parse(notifiedStr) as string[] : [];
+
+        if (isFirstRun.current) {
+            // First time we see data in this session, just mark everything as 'seen'
+            const currentIds = currentStreams.map(s => s.id);
+            await AsyncStorage.setItem(NOTIFIED_IDS_KEY, JSON.stringify([...new Set([...notifiedIds, ...currentIds])]));
+            isFirstRun.current = false;
+            return;
+        }
+
+        const newItems = [];
+        for (const stream of currentStreams) {
+            if (!notifiedIds.includes(stream.id)) {
+                const pref = settings[stream.channelId];
+                const isEnabled = pref ? pref.notify : true;
+                if (isEnabled) {
+                    newItems.push(stream);
+                }
+            }
+        }
+
+        if (newItems.length > 0) {
+            // Notify for up to 3 new items at once to avoid spam
+            for (const item of newItems.slice(0, 3)) {
+                await notifyNewContent(item);
+            }
+
+            // Mark all as notified
+            const allNotified = [...new Set([...notifiedIds, ...currentStreams.map(s => s.id)])];
+            await AsyncStorage.setItem(NOTIFIED_IDS_KEY, JSON.stringify(allNotified));
         }
     };
 

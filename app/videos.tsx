@@ -4,11 +4,13 @@ import { useFocusEffect } from 'expo-router';
 import { getStreams, StreamInfo } from '../src/api/streams';
 import { getMemberSettings } from '../src/services/memberSettings';
 import StreamCard from '../src/components/stream/StreamCard';
+import { useNotifications } from '../src/hooks/useNotifications';
 import { COLORS } from '../src/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function VideoListScreen() {
     const [videos, setVideos] = useState<StreamInfo[]>([]);
+    const [rawStreams, setRawStreams] = useState<StreamInfo[]>([]);
     const [allVideos, setAllVideos] = useState<StreamInfo[]>([]);
     const [visibleCount, setVisibleCount] = useState(6);
     const [loading, setLoading] = useState(true);
@@ -16,6 +18,8 @@ export default function VideoListScreen() {
 
     const scrollY = useRef(new Animated.Value(0)).current;
     const spinAnim = useRef(new Animated.Value(0)).current;
+
+    useNotifications(rawStreams);
 
     const loadVideos = useCallback(async (force = false) => {
         try {
@@ -27,6 +31,8 @@ export default function VideoListScreen() {
                 getStreams(force),
                 getMemberSettings()
             ]);
+
+            setRawStreams(data);
 
             const filtered = data.filter(s => {
                 const isVideo = s.type === 'video';
