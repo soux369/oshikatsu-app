@@ -50,7 +50,15 @@ export default function StreamCard({ stream }: Props) {
             return `${diffHrs}時間前`;
         } else {
             const diffDays = Math.floor(diffHrs / 24);
-            return `${diffDays}日前`;
+            if (diffDays < 7) {
+                return `${diffDays}日前`;
+            } else if (diffDays < 30) {
+                return `${Math.floor(diffDays / 7)}週間前`;
+            } else if (diffDays < 365) {
+                return `${Math.floor(diffDays / 30)}ヶ月前`;
+            } else {
+                return `${Math.floor(diffDays / 365)}年前`;
+            }
         }
     }, [date, stream.status]);
 
