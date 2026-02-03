@@ -165,7 +165,7 @@ export default function StreamCard({ stream }: Props) {
                 />
                 <View style={styles.badgeContainer}>
                     {getStatusBadge()}
-                    {durationStr !== '' && !isShort && (
+                    {durationStr !== '' && (
                         <View style={[styles.badge, styles.durationBadge]}>
                             <Text style={styles.badgeText}>{durationStr}</Text>
                         </View>
@@ -244,7 +244,10 @@ const styles = StyleSheet.create({
     badgeContainer: {
         position: 'absolute',
         bottom: 8,
-        right: 8,
+        left: 8,
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        gap: 4,
     },
     badge: {
         paddingHorizontal: 8,
@@ -253,7 +256,6 @@ const styles = StyleSheet.create({
     },
     durationBadge: {
         backgroundColor: 'rgba(0, 0, 0, 0.75)',
-        marginTop: 4,
     },
     badgeText: {
         color: 'white',

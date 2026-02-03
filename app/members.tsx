@@ -108,6 +108,27 @@ export default function MemberListScreen() {
         );
     };
 
+    const getDisplayBulkState = () => {
+        const displaySettings = AOGIRI_MEMBERS.map(m => settings[m.id]?.display ?? true);
+        const allTrue = displaySettings.every(val => val === true);
+        const allFalse = displaySettings.every(val => val === false);
+        if (allTrue) return 'all';
+        if (allFalse) return 'none';
+        return 'partial';
+    };
+
+    const getNotifyBulkState = () => {
+        const notifySettings = AOGIRI_MEMBERS.map(m => settings[m.id]?.notify ?? true);
+        const allTrue = notifySettings.every(val => val === true);
+        const allFalse = notifySettings.every(val => val === false);
+        if (allTrue) return 'all';
+        if (allFalse) return 'none';
+        return 'partial';
+    };
+
+    const displayBulkState = getDisplayBulkState();
+    const notifyBulkState = getNotifyBulkState();
+
     return (
         <View style={styles.container}>
             <FlatList
@@ -128,13 +149,21 @@ export default function MemberListScreen() {
                                 <Text style={styles.bulkLabel}>表示:</Text>
                                 <View style={styles.bulkToggles}>
                                     <TouchableOpacity style={styles.bulkToggleBtn} onPress={() => bulkUpdate('display', 'all')}>
-                                        <Ionicons name="checkbox" size={18} color={COLORS.primary} />
+                                        <Ionicons
+                                            name="checkbox"
+                                            size={20}
+                                            color={displayBulkState === 'all' ? COLORS.primary : "rgba(255,255,255,0.2)"}
+                                        />
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.bulkToggleBtn} onPress={() => bulkUpdate('display', 'none')}>
-                                        <Ionicons name="square-outline" size={18} color={COLORS.textSecondary} />
+                                        <Ionicons
+                                            name="square"
+                                            size={20}
+                                            color={displayBulkState === 'none' ? COLORS.primary : "rgba(255,255,255,0.2)"}
+                                        />
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.bulkToggleBtn} onPress={() => bulkUpdate('display', 'invert')}>
-                                        <Ionicons name="swap-horizontal" size={18} color={COLORS.textSecondary} />
+                                        <Ionicons name="swap-horizontal" size={20} color="rgba(255,255,255,0.6)" />
                                     </TouchableOpacity>
                                 </View>
                             </View>
@@ -143,13 +172,21 @@ export default function MemberListScreen() {
                                 <Text style={styles.bulkLabel}>通知:</Text>
                                 <View style={styles.bulkToggles}>
                                     <TouchableOpacity style={styles.bulkToggleBtn} onPress={() => bulkUpdate('notify', 'all')}>
-                                        <Ionicons name="notifications" size={18} color="#FFC107" />
+                                        <Ionicons
+                                            name="notifications"
+                                            size={20}
+                                            color={notifyBulkState === 'all' ? "#FFC107" : "rgba(255,255,255,0.2)"}
+                                        />
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.bulkToggleBtn} onPress={() => bulkUpdate('notify', 'none')}>
-                                        <Ionicons name="notifications-off-outline" size={18} color={COLORS.textSecondary} />
+                                        <Ionicons
+                                            name="notifications-off"
+                                            size={20}
+                                            color={notifyBulkState === 'none' ? "#FFC107" : "rgba(255,255,255,0.2)"}
+                                        />
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.bulkToggleBtn} onPress={() => bulkUpdate('notify', 'invert')}>
-                                        <Ionicons name="swap-horizontal" size={18} color={COLORS.textSecondary} />
+                                        <Ionicons name="swap-horizontal" size={20} color="rgba(255,255,255,0.6)" />
                                     </TouchableOpacity>
                                 </View>
                             </View>
