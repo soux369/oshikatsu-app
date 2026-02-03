@@ -2,7 +2,7 @@ name: Update Streams Data
 
 on:
   schedule:
-    - cron: '*/10 * * * *' # Every 10 minutes (Optimal responsiveness/quota)
+    - cron: '0 * * * *' # Once per hour as a background fallback. Main updates triggered by GAS.
   workflow_dispatch:
   repository_dispatch:
     types: [trigger-update]
