@@ -232,7 +232,7 @@ export default function StreamCard({ stream }: Props) {
                         <View style={[
                             styles.avatarPlaceholder,
                             { backgroundColor: isActualEndedStream ? '#444' : member.color },
-                            stream.status === 'live' || stream.type === 'video' ? styles.avatarLiveBorder : null
+                            stream.status !== 'ended' ? styles.avatarLiveBorder : null
                         ]}>
                             {stream.channelThumbnailUrl ? (
                                 <Image
