@@ -11,7 +11,10 @@
       "name": "あおぎり通知",
       "supportsTablet": true,
       "bundleIdentifier": "jp.mono0261.aogirinotify",
-      "buildNumber": "1"
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "name": "あおぎり通知",
