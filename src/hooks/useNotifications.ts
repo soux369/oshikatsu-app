@@ -10,6 +10,7 @@ const NOTIFIED_IDS_KEY = 'NOTIFIED_CONTENT_IDS';
 
 export const useNotifications = (streams: StreamInfo[], onRefresh?: () => void) => {
     const isFirstRun = useRef(true);
+    const sessionNotifiedIds = useRef<Set<string>>(new Set());
 
     // Listen for notification received while in foreground
     useEffect(() => {
@@ -37,63 +38,68 @@ export const useNotifications = (streams: StreamInfo[], onRefresh?: () => void) 
             if (!granted) return;
 
             // When streams list updates, sync notifications
-            await syncNotifications(streams);
+            if (streams && streams.length > 0) {
+                await syncNotifications(streams);
+            }
         };
 
         setup();
     }, [streams]);
 
     const syncNotifications = async (currentStreams: StreamInfo[]) => {
-        // Strategy for Scheduled Reminders: Cancel all and reschedule
-        // (Simple but effective for upcoming start times)
+        // --- Part 1: Scheduled Reminders (Stream Start) ---
+        // (Don't cancel all immediately to avoid notification gaps; only cancel if needed)
+        // For simplicity in this current architecture, we still do it, but focused on Part 1
         await cancelAllNotifications();
 
         const settings = await getMemberSettings();
-
-        // --- Part 1: Scheduled Reminders (Stream Start) ---
         const upcomingStreams = currentStreams.filter(s => s.status === 'upcoming');
         for (const stream of upcomingStreams) {
             const pref = settings[stream.channelId];
-            const isEnabled = pref ? pref.notify : true;
-            if (isEnabled) {
+            if (pref ? pref.notify : true) {
                 await scheduleStreamNotification(stream);
             }
         }
 
-        // --- Part 2: New Content Notifications (New discovery) ---
-        // We only notify for NEW entries that we haven't seen before.
-        // We skip this check on the very first run of the app to avoid spamming 50+ notifications.
+        // --- Part 2: New Content Notifications (Discovery) ---
         const notifiedStr = await AsyncStorage.getItem(NOTIFIED_IDS_KEY);
-        const notifiedIds = notifiedStr ? JSON.parse(notifiedStr) as string[] : [];
+        const persistedNotifiedIds = notifiedStr ? JSON.parse(notifiedStr) as string[] : [];
+
+        // Merge persistent and session IDs
+        const knownIds = new Set([...persistedNotifiedIds, ...Array.from(sessionNotifiedIds.current)]);
 
         if (isFirstRun.current) {
-            // First time we see data in this session, just mark everything as 'seen'
-            const currentIds = currentStreams.map(s => s.id);
-            await AsyncStorage.setItem(NOTIFIED_IDS_KEY, JSON.stringify([...new Set([...notifiedIds, ...currentIds])]));
+            // Mark all current IDs as known without notifying
+            const allCurrentIds = currentStreams.map(s => s.id);
+            const newNotifiedList = [...new Set([...persistedNotifiedIds, ...allCurrentIds])];
+            await AsyncStorage.setItem(NOTIFIED_IDS_KEY, JSON.stringify(newNotifiedList));
+            allCurrentIds.forEach(id => sessionNotifiedIds.current.add(id));
             isFirstRun.current = false;
             return;
         }
 
-        const newItems = [];
+        const newItemsToNotify: StreamInfo[] = [];
         for (const stream of currentStreams) {
-            if (!notifiedIds.includes(stream.id)) {
+            if (!knownIds.has(stream.id)) {
                 const pref = settings[stream.channelId];
-                const isEnabled = pref ? pref.notify : true;
-                if (isEnabled) {
-                    newItems.push(stream);
+                if (pref ? pref.notify : true) {
+                    newItemsToNotify.push(stream);
                 }
             }
         }
 
-        if (newItems.length > 0) {
-            // Notify for up to 3 new items at once to avoid spam
-            for (const item of newItems.slice(0, 3)) {
+        if (newItemsToNotify.length > 0) {
+            // Notify for up to 3 new items at once
+            for (const item of newItemsToNotify.slice(0, 3)) {
                 await notifyNewContent(item);
+                sessionNotifiedIds.current.add(item.id);
             }
-
-            // Mark all as notified
-            const allNotified = [...new Set([...notifiedIds, ...currentStreams.map(s => s.id)])];
-            await AsyncStorage.setItem(NOTIFIED_IDS_KEY, JSON.stringify(allNotified));
         }
+
+        // ALWAYS update the persisted list with ALL currently seen IDs
+        // This ensures that even if we didn't notify (e.g. settings off), we won't treat them as 'new' later
+        const finalNotifiedList = [...new Set([...persistedNotifiedIds, ...currentStreams.map(s => s.id)])];
+        await AsyncStorage.setItem(NOTIFIED_IDS_KEY, JSON.stringify(finalNotifiedList));
+        currentStreams.forEach(s => sessionNotifiedIds.current.add(s.id));
     };
 };

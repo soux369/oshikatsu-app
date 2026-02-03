@@ -60,10 +60,16 @@ export const scheduleStreamNotification = async (stream: StreamInfo, minutesBefo
  * Trigger an immediate notification for newly added content
  */
 export const notifyNewContent = async (stream: StreamInfo) => {
-    const isStream = stream.type === 'stream';
-    const typeLabel = isStream ? '配信予定' : '新着動画';
+    const isLive = stream.status === 'live';
+    const isVideo = stream.type === 'video' && stream.status === 'ended';
+
+    let typeLabel = '新着';
+    if (isLive) typeLabel = 'ライブ開始';
+    else if (stream.status === 'upcoming') typeLabel = '配信予約';
+    else if (isVideo) typeLabel = '新着動画';
 
     await Notifications.scheduleNotificationAsync({
+        identifier: stream.id, // Use stream ID as notification identifier to prevent duplicates
         content: {
             title: `【${typeLabel}】${stream.channelTitle}`,
             body: stream.title,

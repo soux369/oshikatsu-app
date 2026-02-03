@@ -18,13 +18,35 @@ export const MaterialTopTabs = withLayoutContext<
     MaterialTopTabNavigationEventMap
 >(Navigator);
 
-import { useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useNotifications } from '../src/hooks/useNotifications';
+import { getStreams, StreamInfo } from '../src/api/streams';
 import { registerForPushNotificationsAsync } from '../src/services/notifications';
 
 export default function Layout() {
+    const [streams, setStreams] = useState<StreamInfo[]>([]);
+
+    const refreshData = useCallback(async () => {
+        try {
+            const data = await getStreams(true); // Always fetch fresh for notifications
+            setStreams(data);
+        } catch (e) {
+            console.error('Root refresh failed', e);
+        }
+    }, []);
+
+    useNotifications(streams, refreshData);
+
     useEffect(() => {
         registerForPushNotificationsAsync();
-    }, []);
+
+        // Initial fetch
+        refreshData();
+
+        // Background refresh every 10 minutes
+        const interval = setInterval(refreshData, 10 * 60 * 1000);
+        return () => clearInterval(interval);
+    }, [refreshData]);
 
     return (
         <SafeAreaProvider>

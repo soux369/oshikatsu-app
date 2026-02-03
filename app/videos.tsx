@@ -106,7 +106,7 @@ export default function VideoListScreen() {
     const scrollY = useRef(new Animated.Value(0)).current;
     const spinAnim = useRef(new Animated.Value(0)).current;
 
-    useNotifications(rawStreams, () => loadVideos(true));
+
 
     const loadVideos = useCallback(async (force = false) => {
         try {
