@@ -214,11 +214,19 @@ async function fetchVideosBySearch(channelId) {
 async function fetchUpcomingStreams() {
     const url = `https://www.googleapis.com/youtube/v3/search`;
     const CHANNEL_IDS = MEMBERS.map(m => m.id);
+
+    // メンバー全員の名前を OR で繋いで検索クエリを作成 (検索漏れ防止)
+    const query = [
+        'あおぎり高校',
+        ...MEMBERS.map(m => m.name.split(' ')[0])
+    ].join(' | ');
+
     try {
+        console.log(`Searching for upcoming with query: ${query}`);
         const response = await axios.get(url, {
             params: {
                 part: 'snippet',
-                q: 'あおぎり高校',
+                q: query,
                 type: 'video',
                 eventType: 'upcoming',
                 key: API_KEY,
@@ -231,6 +239,7 @@ async function fetchUpcomingStreams() {
             .filter(item => CHANNEL_IDS.includes(item.snippet.channelId))
             .map(item => item.id.videoId);
     } catch (error) {
+        console.error('Upcoming search failed:', error.message);
         return [];
     }
 }
