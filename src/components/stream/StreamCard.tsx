@@ -121,9 +121,16 @@ export default function StreamCard({ stream }: Props) {
                 <View style={styles.headerRow}>
                     {member && (
                         <View style={[styles.avatarPlaceholder, { backgroundColor: member.color }]}>
-                            <Text style={[styles.avatarText, { color: getAvatarTextColor(member.color) }]}>
-                                {member.name[0]}
-                            </Text>
+                            {stream.channelThumbnailUrl ? (
+                                <Image
+                                    source={{ uri: stream.channelThumbnailUrl }}
+                                    style={styles.avatarImage}
+                                />
+                            ) : (
+                                <Text style={[styles.avatarText, { color: getAvatarTextColor(member.color) }]}>
+                                    {member.name[0]}
+                                </Text>
+                            )}
                         </View>
                     )}
                     <View style={styles.textContainer}>
@@ -138,6 +145,7 @@ export default function StreamCard({ stream }: Props) {
                             <Text style={styles.separator}>•</Text>
                             <Text style={styles.time}>{dateStr}</Text>
                         </View>
+                        <Text style={styles.disclaimer}>※非公式ファンアプリ</Text>
                     </View>
                 </View>
             </View>
@@ -190,15 +198,19 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     avatarPlaceholder: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        width: 44,
+        height: 44,
+        borderRadius: 22,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
+        overflow: 'hidden',
+    },
+    avatarImage: {
+        width: 44,
+        height: 44,
     },
     avatarText: {
-        color: '#fff',
         fontWeight: 'bold',
         fontSize: 18,
     },
@@ -210,7 +222,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: '600',
         color: COLORS.textPrimary,
-        marginBottom: 4,
+        marginBottom: 2,
         lineHeight: 20,
     },
     titleEnded: {
@@ -232,5 +244,11 @@ const styles = StyleSheet.create({
     time: {
         fontSize: 13,
         color: COLORS.textSecondary,
+    },
+    disclaimer: {
+        fontSize: 10,
+        color: COLORS.textSecondary,
+        opacity: 0.6,
+        fontStyle: 'italic',
     },
 });

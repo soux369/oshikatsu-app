@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity, Animated, Easing, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from 'expo-router';
 import { getStreams, StreamInfo } from '../src/api/streams';
 import { getMemberSettings } from '../src/services/memberSettings';
@@ -56,6 +57,28 @@ export default function StreamListScreen() {
             loadStreams();
         }, [loadStreams])
     );
+
+    // First launch disclaimer
+    useEffect(() => {
+        const checkFirstLaunch = async () => {
+            const hasLaunched = await AsyncStorage.getItem('HAS_LAUNCHED');
+            if (!hasLaunched) {
+                Alert.alert(
+                    'ご利用にあたって',
+                    '本アプリは「あおぎり高校」ファンによる非公式アプリです。\n\n公式とは一切関係がありません。また、コンテンツの著作権は各権利者に帰属します。\nYouTubeへの誘導を目的とした応援アプリとしてご利用ください。',
+                    [
+                        {
+                            text: '同意して利用する',
+                            onPress: async () => {
+                                await AsyncStorage.setItem('HAS_LAUNCHED', 'true');
+                            }
+                        }
+                    ]
+                );
+            }
+        };
+        checkFirstLaunch();
+    }, []);
 
     // Auto-refresh every 10 minutes (Silent refresh)
     useEffect(() => {

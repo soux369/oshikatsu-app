@@ -1,19 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Switch } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Switch, Image } from 'react-native';
 import { AOGIRI_MEMBERS, Member } from '../src/constants/members';
 import { getMemberSettings, saveMemberSettings, MemberSettingsMap } from '../src/services/memberSettings';
+import { getStreams, StreamInfo } from '../src/api/streams';
 import { COLORS } from '../src/constants/theme';
 
 export default function MemberListScreen() {
     const [settings, setSettings] = useState<MemberSettingsMap>({});
+    const [streams, setStreams] = useState<StreamInfo[]>([]);
 
     useEffect(() => {
-        loadSettings();
+        loadData();
     }, []);
 
-    const loadSettings = async () => {
-        const data = await getMemberSettings();
-        setSettings(data);
+    const loadData = async () => {
+        const [settingsData, streamsData] = await Promise.all([
+            getMemberSettings(),
+            getStreams()
+        ]);
+        setSettings(settingsData);
+        setStreams(streamsData);
     };
 
     const updatePref = async (id: string, key: 'display' | 'notify', value: boolean) => {
@@ -28,12 +34,22 @@ export default function MemberListScreen() {
 
     const renderItem = ({ item }: { item: Member }) => {
         const pref = settings[item.id] || { display: true, notify: true };
+        const stream = streams.find(s => s.channelId === item.id);
 
         return (
             <View style={styles.itemContainer}>
                 <View style={styles.memberInfo}>
-                    <View style={[styles.colorDot, { backgroundColor: item.color }]} />
-                    <Text style={styles.memberName}>{item.name}</Text>
+                    <View style={[styles.avatarPlaceholder, { backgroundColor: item.color }]}>
+                        {stream?.channelThumbnailUrl ? (
+                            <Image source={{ uri: stream.channelThumbnailUrl }} style={styles.avatarImage} />
+                        ) : (
+                            <Text style={styles.avatarTextPlaceholder}>{item.name[0]}</Text>
+                        )}
+                    </View>
+                    <View>
+                        <Text style={styles.memberName}>{item.name}</Text>
+                        <Text style={styles.disclaimer}>※非公式ファンアプリ</Text>
+                    </View>
                 </View>
                 <View style={styles.switchGroup}>
                     <View style={styles.switchItem}>
@@ -101,16 +117,34 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flex: 1,
     },
-    colorDot: {
-        width: 12,
-        height: 12,
-        borderRadius: 6,
-        marginRight: 10,
+    avatarPlaceholder: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+        overflow: 'hidden',
+    },
+    avatarImage: {
+        width: 44,
+        height: 44,
+    },
+    avatarTextPlaceholder: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 18,
     },
     memberName: {
         fontSize: 16,
         color: COLORS.textPrimary,
         fontWeight: '600',
+    },
+    disclaimer: {
+        fontSize: 10,
+        color: COLORS.textSecondary,
+        opacity: 0.6,
+        fontStyle: 'italic',
     },
     switchGroup: {
         flexDirection: 'row',

@@ -23,6 +23,7 @@ const MEMBERS = [
 ];
 
 function parseISO8601Duration(duration) {
+    if (!duration) return 0;
     const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
     if (!match) return 0;
     const h = parseInt(match[1] || 0);
@@ -51,16 +52,13 @@ async function update() {
             let playlistId = uploadsMap[member.id];
             let videoIds = [];
 
-            // Try Playlist Fetch first
             if (playlistId) {
                 videoIds = await fetchRecentVideosFromPlaylist(playlistId);
             } else {
-                // If map failed, try standard UU replacement
                 const fallbackPlaylistId = member.id.replace(/^UC/, 'UU');
                 videoIds = await fetchRecentVideosFromPlaylist(fallbackPlaylistId);
             }
 
-            // If Playlist failed (empty), try Force Search for this channel
             if (videoIds.length === 0) {
                 console.log(`Playlist fetch failed for ${member.name}, trying Search API...`);
                 videoIds = await fetchVideosBySearch(member.id);
@@ -74,12 +72,12 @@ async function update() {
         results.forEach(ids => allVideoIds.push(...ids));
         console.log(`Fetched content IDs from ${fetchedPlaylistsCount}/${MEMBERS.length} channels.`);
 
-        // 2. Fetch Upcoming Streams explicitly via Search API
+        // 2. Fetch Upcoming Streams
         console.log('Fetching upcoming streams from Search API...');
         const upcomingIds = await fetchUpcomingStreams();
         allVideoIds.push(...upcomingIds);
 
-        // Deduplicate IDs
+        // Deduplicate
         allVideoIds = [...new Set(allVideoIds)];
 
         if (allVideoIds.length === 0) {
@@ -91,11 +89,8 @@ async function update() {
         console.log(`Verifying details for ${allVideoIds.length} videos...`);
         let verifiedItems = await fetchVideoDetails(allVideoIds);
 
-        // --- ENHANCED DEDUPLICATION ---
-        // Some members have duplicate titles for different IDs (e.g., short placeholder + actual Archive)
-        // Or multiple search results for the same event.
+        // Deduplicate items by title and duration
         const sortedByQuality = verifiedItems.sort((a, b) => {
-            // Prefer items with duration > 0
             const durA = parseISO8601Duration(a.duration || '');
             const durB = parseISO8601Duration(b.duration || '');
             return durB - durA;
@@ -103,23 +98,16 @@ async function update() {
 
         const uniqueItemsMap = new Map();
         for (const item of sortedByQuality) {
-            // Key by title + channelId to catch same-stream duplicates with different IDs
             const key = `${item.channelId}_${item.title.trim()}`;
             if (!uniqueItemsMap.has(key)) {
                 uniqueItemsMap.set(key, item);
-            } else {
-                // If we already have it, check if the new one is 'upcoming' while the stored is 'ended'
-                // Or if the stored one has 0 duration and this one doesn't.
-                // Since we sorted by duration Desc, the first one is usually the better one.
             }
         }
 
         let finalItems = Array.from(uniqueItemsMap.values());
-
-        // Sort by Date Newest
         finalItems.sort((a, b) => {
-            const timeA = new Date(a.scheduledStartTime || a.publishedAt || 0).getTime();
-            const timeB = new Date(b.scheduledStartTime || b.publishedAt || 0).getTime();
+            const timeA = new Date(a.scheduledStartTime || 0).getTime();
+            const timeB = new Date(b.scheduledStartTime || 0).getTime();
             return timeB - timeA;
         });
 
@@ -127,9 +115,6 @@ async function update() {
         console.log(`Successfully updated streams.json with ${finalItems.length} unique items.`);
     } catch (e) {
         console.error('Update failed:', e.message);
-        if (e.response) {
-            console.error('Response data:', e.response.data);
-        }
     }
 }
 
@@ -160,7 +145,7 @@ async function fetchRecentVideosFromPlaylist(playlistId) {
     try {
         const response = await axios.get(url, {
             params: {
-                part: 'snippet,contentDetails',
+                part: 'contentDetails',
                 playlistId: playlistId,
                 maxResults: 50,
                 key: API_KEY,
@@ -187,7 +172,6 @@ async function fetchVideosBySearch(channelId) {
         });
         return response.data.items.map(item => item.id.videoId);
     } catch (error) {
-        console.warn(`Search fallback failed for ${channelId}:`, error.message);
         return [];
     }
 }
@@ -212,7 +196,6 @@ async function fetchUpcomingStreams() {
             .filter(item => CHANNEL_IDS.includes(item.snippet.channelId))
             .map(item => item.id.videoId);
     } catch (error) {
-        console.warn(`Search for upcoming failed:`, error.message);
         return [];
     }
 }
@@ -233,6 +216,23 @@ async function fetchVideoDetails(videoIds) {
             allItems.push(...response.data.items);
         }
 
+        // Fetch Channel Thumbnails
+        const chanIds = [...new Set(allItems.map(item => item.snippet.channelId))];
+        const channelThumbnails = {};
+        for (let i = 0; i < chanIds.length; i += 50) {
+            const batchIds = chanIds.slice(i, i + 50);
+            const channelResponse = await axios.get(`https://www.googleapis.com/youtube/v3/channels`, {
+                params: {
+                    part: 'snippet',
+                    id: batchIds.join(','),
+                    key: API_KEY,
+                }
+            });
+            channelResponse.data.items.forEach(c => {
+                channelThumbnails[c.id] = c.snippet.thumbnails.default?.url || c.snippet.thumbnails.medium?.url;
+            });
+        }
+
         return allItems.map(item => {
             let status = item.snippet.liveBroadcastContent;
             const liveDetails = item.liveStreamingDetails;
@@ -242,15 +242,12 @@ async function fetchVideoDetails(videoIds) {
             const isLongVideo = durationSec > 25 * 60;
 
             let type = liveDetails ? 'stream' : 'video';
-
             if (type === 'stream' && !isLongVideo && status === 'none') {
                 type = 'video';
             }
 
-            // Special handling for Ended streams
             if (liveDetails) {
-                const actualEndTime = liveDetails.actualEndTime;
-                if (actualEndTime || status === 'none') {
+                if (liveDetails.actualEndTime || status === 'none') {
                     status = 'ended';
                 }
                 const startTimeStr = liveDetails.scheduledStartTime || item.snippet.publishedAt;
@@ -262,8 +259,6 @@ async function fetchVideoDetails(videoIds) {
                 status = 'ended';
             }
 
-            const startTime = liveDetails?.scheduledStartTime || item.snippet.publishedAt;
-
             return {
                 id: item.id,
                 title: item.snippet.title,
@@ -272,7 +267,8 @@ async function fetchVideoDetails(videoIds) {
                 type: type,
                 channelTitle: item.snippet.channelTitle,
                 channelId: item.snippet.channelId,
-                scheduledStartTime: startTime,
+                channelThumbnailUrl: channelThumbnails[item.snippet.channelId],
+                scheduledStartTime: liveDetails?.scheduledStartTime || item.snippet.publishedAt,
                 duration: contentDetails?.duration,
                 updatedAt: new Date().toISOString()
             };

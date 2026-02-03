@@ -42,5 +42,6 @@ export interface StreamInfo {
     type: 'stream' | 'video';
     channelTitle: string;
     channelId: string;
+    channelThumbnailUrl?: string; // YouTube channel icon
     duration?: string; // ISO 8601 duration
 }
