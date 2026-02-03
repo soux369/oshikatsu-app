@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Linking } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StreamInfo } from '../../api/streams';
 import { getMemberById } from '../../constants/members';
 import { COLORS } from '../../constants/theme';
@@ -10,6 +11,38 @@ interface Props {
 
 export default function StreamCard({ stream }: Props) {
     const member = getMemberById(stream.channelId);
+    const [timeLeft, setTimeLeft] = React.useState('');
+
+    React.useEffect(() => {
+        if (stream.status !== 'upcoming' || !stream.scheduledStartTime) return;
+
+        const updateTimer = () => {
+            const now = new Date().getTime();
+            const start = new Date(stream.scheduledStartTime!).getTime();
+            const diff = start - now;
+
+            if (diff <= 0) {
+                setTimeLeft('間もなく開始');
+                return;
+            }
+
+            const hrs = Math.floor(diff / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+            if (hrs > 0) {
+                setTimeLeft(`あと ${hrs}時間${mins}分`);
+            } else if (mins > 0) {
+                setTimeLeft(`あと ${mins}分${secs}秒`);
+            } else {
+                setTimeLeft(`あと ${secs}秒`);
+            }
+        };
+
+        updateTimer();
+        const timer = setInterval(updateTimer, 1000);
+        return () => clearInterval(timer);
+    }, [stream.status, stream.scheduledStartTime]);
 
     const openStream = () => {
         Linking.openURL(`https://www.youtube.com/watch?v=${stream.id}`);
@@ -65,7 +98,8 @@ export default function StreamCard({ stream }: Props) {
     const getStatusBadge = () => {
         if (isShort) {
             return (
-                <View style={[styles.badge, { backgroundColor: '#FF0000' }]}>
+                <View style={[styles.badge, { backgroundColor: '#FF0000', flexDirection: 'row', alignItems: 'center' }]}>
+                    <MaterialCommunityIcons name={"youtube-shorts" as any} size={14} color="white" style={{ marginRight: 4 }} />
                     <Text style={styles.badgeText}>ショート</Text>
                 </View>
             );
@@ -162,7 +196,7 @@ export default function StreamCard({ stream }: Props) {
                         <View style={styles.metaRow}>
                             <Text style={styles.channelName}>{member?.name || stream.channelId}</Text>
                             <Text style={styles.separator}>•</Text>
-                            <Text style={styles.time}>{dateStr}</Text>
+                            <Text style={styles.time}>{stream.status === 'upcoming' && timeLeft ? timeLeft : dateStr}</Text>
                         </View>
                     </View>
                 </View>

@@ -102,10 +102,9 @@ export default function MemberListScreen() {
                 contentContainerStyle={styles.listContent}
                 ListHeaderComponent={
                     <View style={styles.header}>
-                        <Text style={styles.headerTitle}>メンバー設定</Text>
                         <View style={styles.disclaimerBox}>
                             <Text style={styles.headerDisclaimer}>
-                                ※本アプリはファンによる非公式アプリであり、公式（あおぎり高校）とは一切関係ありません。
+                                ※本ファンアプリはファン有志による非営利プロジェクトであり、株式会社アップランドおよび「あおぎり高校」公式とは一切関係ありません。
                             </Text>
                         </View>
                     </View>
@@ -197,17 +196,17 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     disclaimerBox: {
-        backgroundColor: 'rgba(255, 0, 0, 0.1)',
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
         padding: 12,
         borderRadius: 8,
         borderWidth: 1,
-        borderColor: 'rgba(255, 0, 0, 0.3)',
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        marginBottom: 8,
     },
     headerDisclaimer: {
-        fontSize: 14,
-        color: '#ff4444',
-        fontWeight: 'bold',
-        lineHeight: 20,
+        fontSize: 12,
+        color: COLORS.textSecondary,
+        lineHeight: 18,
         textAlign: 'center',
     },
 });

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity, Animated, Easing, TextInput } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { getStreams, StreamInfo } from '../src/api/streams';
 import { getMemberSettings } from '../src/services/memberSettings';
@@ -15,6 +15,8 @@ export default function VideoListScreen() {
     const [visibleCount, setVisibleCount] = useState(6);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [sortOption, setSortOption] = useState<'date' | 'name'>('date');
 
     const scrollY = useRef(new Animated.Value(0)).current;
     const spinAnim = useRef(new Animated.Value(0)).current;
@@ -73,8 +75,28 @@ export default function VideoListScreen() {
     }, [loadVideos]);
 
     useEffect(() => {
-        setVideos(allVideos.slice(0, visibleCount));
-    }, [allVideos, visibleCount]);
+        let filtered = [...allVideos];
+
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter(s =>
+                s.title.toLowerCase().includes(query) ||
+                s.channelTitle.toLowerCase().includes(query)
+            );
+        }
+
+        if (sortOption === 'name') {
+            filtered.sort((a, b) => a.channelTitle.localeCompare(b.channelTitle));
+        } else {
+            filtered.sort((a, b) => {
+                const timeA = new Date(a.scheduledStartTime || 0).getTime();
+                const timeB = new Date(b.scheduledStartTime || 0).getTime();
+                return timeB - timeA;
+            });
+        }
+
+        setVideos(filtered.slice(0, visibleCount));
+    }, [allVideos, visibleCount, searchQuery, sortOption]);
 
     useEffect(() => {
         if (refreshing) {
@@ -157,6 +179,35 @@ export default function VideoListScreen() {
                     styles.listContent,
                     { backgroundColor: COLORS.background }
                 ]}
+                ListHeaderComponent={
+                    <View style={styles.headerControls}>
+                        <View style={styles.searchContainer}>
+                            <Ionicons name="search" size={18} color={COLORS.textSecondary} style={{ marginRight: 8 }} />
+                            <TextInput
+                                style={styles.searchInput}
+                                placeholder="検索（タイトル・名前）"
+                                placeholderTextColor={COLORS.textSecondary}
+                                value={searchQuery}
+                                onChangeText={setSearchQuery}
+                                clearButtonMode="while-editing"
+                            />
+                        </View>
+                        <View style={styles.sortContainer}>
+                            <TouchableOpacity
+                                style={[styles.sortButton, sortOption === 'date' && styles.sortButtonActive]}
+                                onPress={() => setSortOption('date')}
+                            >
+                                <Text style={[styles.sortButtonText, sortOption === 'date' && styles.sortButtonTextActive]}>日付順</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.sortButton, sortOption === 'name' && styles.sortButtonActive]}
+                                onPress={() => setSortOption('name')}
+                            >
+                                <Text style={[styles.sortButtonText, sortOption === 'name' && styles.sortButtonTextActive]}>名前順</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                }
                 onScroll={Animated.event(
                     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
                     { useNativeDriver: true }
@@ -238,6 +289,50 @@ const styles = StyleSheet.create({
     moreButtonText: {
         color: '#eee',
         fontSize: 14,
+        fontWeight: 'bold',
+    },
+    headerControls: {
+        paddingHorizontal: 16,
+        paddingBottom: 8,
+    },
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#1a1a1a',
+        borderRadius: 10,
+        paddingHorizontal: 12,
+        height: 40,
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: '#333',
+    },
+    searchInput: {
+        flex: 1,
+        color: COLORS.textPrimary,
+        fontSize: 14,
+    },
+    sortContainer: {
+        flexDirection: 'row',
+        gap: 8,
+    },
+    sortButton: {
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
+        backgroundColor: '#1a1a1a',
+        borderWidth: 1,
+        borderColor: '#333',
+    },
+    sortButtonActive: {
+        backgroundColor: COLORS.primary,
+        borderColor: COLORS.primary,
+    },
+    sortButtonText: {
+        fontSize: 12,
+        color: COLORS.textSecondary,
+    },
+    sortButtonTextActive: {
+        color: '#fff',
         fontWeight: 'bold',
     },
 });

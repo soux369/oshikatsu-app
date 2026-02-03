@@ -54,7 +54,7 @@ export default function Layout() {
                     />
                     <MaterialTopTabs.Screen
                         name="members"
-                        options={{ title: 'メンバー' }}
+                        options={{ title: '設定' }}
                     />
                 </MaterialTopTabs>
             </SafeAreaView>
