@@ -229,11 +229,12 @@ export default function StreamCard({ stream }: Props) {
 
 const styles = StyleSheet.create({
     card: {
+        flex: 1,
         backgroundColor: COLORS.cardBackground,
         marginBottom: 12,
         borderRadius: 12,
         overflow: 'hidden',
-        marginHorizontal: 12,
+        marginHorizontal: 6, // Reduced to handle grid gap better
         elevation: 2,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },

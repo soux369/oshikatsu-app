@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity, Animated, Easing, Alert, TextInput, Platform } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity, Animated, Easing, TextInput, Alert, useWindowDimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from 'expo-router';
 import { getStreams, StreamInfo } from '../src/api/streams';
@@ -98,6 +98,8 @@ export default function StreamListScreen() {
     const [rawStreams, setRawStreams] = useState<StreamInfo[]>([]);
     const [allData, setAllData] = useState<{ liveAndUpcoming: StreamInfo[], ended: StreamInfo[] }>({ liveAndUpcoming: [], ended: [] });
     const [visibleCount, setVisibleCount] = useState(6);
+    const { width } = useWindowDimensions();
+    const numColumns = width > 768 ? 3 : width > 480 ? 2 : 1;
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -323,13 +325,16 @@ export default function StreamListScreen() {
             </View>
 
             <Animated.FlatList
+                key={numColumns}
+                numColumns={numColumns}
                 data={streams}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => <StreamCard stream={item} />}
                 contentContainerStyle={[
                     styles.listContent,
-                    { backgroundColor: COLORS.background }
+                    { backgroundColor: COLORS.background, paddingHorizontal: numColumns > 1 ? 6 : 0 }
                 ]}
+                columnWrapperStyle={numColumns > 1 ? { gap: 0 } : null}
                 indicatorStyle="white"
                 onScroll={Animated.event(
                     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
