@@ -287,7 +287,7 @@ export default function StreamListScreen() {
                     ]
                 }
             ]}>
-                <Ionicons name="refresh-circle" size={48} color="#222" />
+                <Ionicons name="refresh-circle" size={48} color="rgba(255,255,255,0.4)" />
             </Animated.View>
 
             <View style={styles.headerControls}>
@@ -323,9 +323,22 @@ export default function StreamListScreen() {
                     styles.listContent,
                     { backgroundColor: COLORS.background }
                 ]}
+                indicatorStyle="white"
                 onScroll={Animated.event(
                     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                    { useNativeDriver: true }
+                    {
+                        useNativeDriver: true,
+                        listener: (event: any) => {
+                            const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+                            const isAtBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height;
+                            const pullUpDistance = (layoutMeasurement.height + contentOffset.y) - contentSize.height;
+
+                            // Trigger load more only on "strong" overscroll at bottom (60px)
+                            if (isAtBottom && pullUpDistance > 60 && hasMore && !loading) {
+                                loadMore();
+                            }
+                        }
+                    }
                 )}
                 scrollEventThrottle={16}
                 refreshControl={
@@ -337,8 +350,6 @@ export default function StreamListScreen() {
                         progressBackgroundColor="transparent"
                     />
                 }
-                onEndReached={loadMore}
-                onEndReachedThreshold={0.5}
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         <Text style={styles.emptyText}>予定されている配信はありません</Text>
@@ -362,11 +373,11 @@ const styles = StyleSheet.create({
     },
     pullIndicator: {
         position: 'absolute',
-        top: 90, // Adjusted for search bar
+        top: 60, // Peak from under search bar
         left: 0,
         right: 0,
         alignItems: 'center',
-        zIndex: 100,
+        zIndex: 5, // Under header (10)
     },
     listContent: {
         paddingTop: 12,
