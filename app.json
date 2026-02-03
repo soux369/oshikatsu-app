@@ -10,7 +10,8 @@
     "ios": {
       "name": "あおぎり通知",
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.aogirioshikatsuapp"
+      "bundleIdentifier": "jp.mono0261.aogirinotify",
+      "buildNumber": "1"
     },
     "android": {
       "name": "あおぎり通知",
@@ -18,7 +19,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.aogirioshikatsuapp",
+      "package": "jp.mono0261.aogirinotify",
+      "versionCode": 1,
       "permissions": [
         "NOTIFICATIONS"
       ]
