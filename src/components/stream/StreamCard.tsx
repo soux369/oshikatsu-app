@@ -120,14 +120,25 @@ export default function StreamCard({ stream }: Props) {
             <View style={styles.infoContainer}>
                 <View style={styles.headerRow}>
                     {member && (
-                        <View style={[styles.avatarPlaceholder, { backgroundColor: member.color }]}>
+                        <View style={[
+                            styles.avatarPlaceholder,
+                            { backgroundColor: member.color },
+                            stream.status === 'live' && styles.avatarLiveBorder
+                        ]}>
                             {stream.channelThumbnailUrl ? (
                                 <Image
                                     source={{ uri: stream.channelThumbnailUrl }}
-                                    style={styles.avatarImage}
+                                    style={[
+                                        styles.avatarImage,
+                                        isActualEndedStream && styles.avatarEnded
+                                    ]}
                                 />
                             ) : (
-                                <Text style={[styles.avatarText, { color: getAvatarTextColor(member.color) }]}>
+                                <Text style={[
+                                    styles.avatarText,
+                                    { color: getAvatarTextColor(member.color) },
+                                    isActualEndedStream && styles.avatarEnded
+                                ]}>
                                     {member.name[0]}
                                 </Text>
                             )}
@@ -206,8 +217,15 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     avatarImage: {
-        width: 44,
-        height: 44,
+        width: '100%',
+        height: '100%',
+    },
+    avatarLiveBorder: {
+        borderWidth: 2,
+        borderColor: '#ff0000',
+    },
+    avatarEnded: {
+        opacity: 0.4,
     },
     avatarText: {
         fontWeight: 'bold',
