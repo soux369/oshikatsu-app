@@ -211,15 +211,15 @@ export default function StreamListScreen() {
                 const timeB = new Date(b.scheduledStartTime || 0).getTime();
                 return timeA - timeB;
             });
+            setStreams([...endedFiltered.slice(0, visibleCount), ...liveUpcomingFiltered]);
         } else {
             endedFiltered.sort((a, b) => {
                 const timeA = new Date(a.scheduledStartTime || 0).getTime();
                 const timeB = new Date(b.scheduledStartTime || 0).getTime();
                 return timeB - timeA;
             });
+            setStreams([...liveUpcomingFiltered, ...endedFiltered.slice(0, visibleCount)]);
         }
-
-        setStreams([...liveUpcomingFiltered, ...endedFiltered.slice(0, visibleCount)]);
     }, [allData, visibleCount, searchQuery, sortOption]);
 
     useEffect(() => {
