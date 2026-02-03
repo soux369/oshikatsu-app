@@ -269,7 +269,12 @@ export default function StreamCard({ stream }: Props) {
                         <View style={styles.metaRow}>
                             <Text style={styles.channelName}>{member?.name || stream.channelId}</Text>
                             <Text style={styles.separator}>•</Text>
-                            <Text style={styles.time}>{stream.status === 'upcoming' && timeLeft ? timeLeft : dateStr}</Text>
+                            <Text style={styles.time}>
+                                {isLive
+                                    ? `${dateStr} (${elapsedTime})`
+                                    : (stream.status === 'upcoming' && timeLeft ? timeLeft : dateStr)
+                                }
+                            </Text>
                         </View>
                     </View>
                 </View>
