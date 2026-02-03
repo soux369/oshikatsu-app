@@ -15,7 +15,7 @@ const SearchBar = React.memo(({ onChange }: { onChange: (text: string) => void }
     useEffect(() => {
         const timer = setTimeout(() => {
             onChange(localValue);
-        }, 150); // Small delay to avoid IME truncation while keeping it snappy
+        }, 500); // Increased delay for stable IME input (especially for multi-tap/flick)
         return () => clearTimeout(timer);
     }, [localValue, onChange]);
 
@@ -31,6 +31,7 @@ const SearchBar = React.memo(({ onChange }: { onChange: (text: string) => void }
                 clearButtonMode="while-editing"
                 autoCapitalize="none"
                 autoCorrect={false}
+                blurOnSubmit={false}
             />
         </View>
     );
@@ -100,7 +101,7 @@ export default function StreamListScreen() {
             if (!hasLaunched) {
                 Alert.alert(
                     'ご利用にあたって',
-                    '本アプリは「あおぎり高校」ファン有志による非公式の応援アプリです。\n\n公式とは一切関係ありません。コンテンツの著作権は各権利者に帰属します。',
+                    '本アプリは「あおぎり高校」ファンの非公式応援アプリです。\n\n公式とは一切関係ありません。コンテンツの著作権は各権利者に帰属します。',
                     [
                         {
                             text: '同意して利用する',
@@ -389,8 +390,8 @@ const styles = StyleSheet.create({
         borderColor: '#333',
     },
     sortToggleActive: {
-        borderColor: COLORS.primary,
-        backgroundColor: '#111',
+        borderColor: '#666',
+        backgroundColor: '#222',
     },
     sortToggleText: {
         fontSize: 12,

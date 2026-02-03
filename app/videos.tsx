@@ -14,7 +14,7 @@ const SearchBar = React.memo(({ onChange }: { onChange: (text: string) => void }
     useEffect(() => {
         const timer = setTimeout(() => {
             onChange(localValue);
-        }, 150);
+        }, 500);
         return () => clearTimeout(timer);
     }, [localValue, onChange]);
 
@@ -30,6 +30,7 @@ const SearchBar = React.memo(({ onChange }: { onChange: (text: string) => void }
                 clearButtonMode="while-editing"
                 autoCapitalize="none"
                 autoCorrect={false}
+                blurOnSubmit={false}
             />
         </View>
     );
@@ -367,8 +368,8 @@ const styles = StyleSheet.create({
         borderColor: '#333',
     },
     sortToggleActive: {
-        borderColor: COLORS.primary,
-        backgroundColor: '#111',
+        borderColor: '#666',
+        backgroundColor: '#222',
     },
     sortToggleText: {
         fontSize: 12,
