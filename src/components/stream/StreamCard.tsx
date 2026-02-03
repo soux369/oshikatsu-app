@@ -49,22 +49,23 @@ export default function StreamCard({ stream }: Props) {
                 const diff = now - start;
 
                 if (diff < 0) {
-                    setElapsedTime('開始直後');
+                    setElapsedTime('0:00');
                     return;
                 }
 
                 const hrs = Math.floor(diff / (1000 * 60 * 60));
                 const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((diff % (1000 * 60)) / 1000);
 
                 if (hrs > 0) {
-                    setElapsedTime(`${hrs}時間${mins}分経過`);
+                    setElapsedTime(`${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
                 } else {
-                    setElapsedTime(`${mins}分経過`);
+                    setElapsedTime(`${mins}:${secs.toString().padStart(2, '0')}`);
                 }
             };
 
             updateElapsed();
-            const timer = setInterval(updateElapsed, 30000); // 30秒ごとに更新
+            const timer = setInterval(updateElapsed, 1000); // 1秒ごとに更新
             return () => clearInterval(timer);
         }
     }, [stream.status, stream.scheduledStartTime]);
