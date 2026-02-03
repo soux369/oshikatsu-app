@@ -328,7 +328,9 @@ export default function VideoListScreen() {
                     hasMore ? (
                         <View style={styles.moreButton}>
                             <Ionicons name="arrow-up" size={14} color="#888" style={{ marginBottom: 4 }} />
-                            <Text style={styles.moreButtonText}>さらに引き上げて10件表示</Text>
+                            <Text style={styles.moreButtonText}>
+                                さらに引き上げて{Math.min(10, allVideos.length - visibleCount)}件表示
+                            </Text>
                         </View>
                     ) : (
                         videos.length > 0 ? <View style={{ height: 40 }} /> : null

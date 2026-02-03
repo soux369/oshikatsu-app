@@ -355,7 +355,9 @@ export default function StreamListScreen() {
                     hasMore ? (
                         <View style={styles.moreButton}>
                             <Ionicons name="arrow-up" size={14} color="#888" style={{ marginBottom: 4 }} />
-                            <Text style={styles.moreButtonText}>さらに引き上げて10件表示</Text>
+                            <Text style={styles.moreButtonText}>
+                                さらに引き上げて{Math.min(10, allData.ended.length - visibleCount)}件表示
+                            </Text>
                         </View>
                     ) : (
                         streams.length > 0 ? <View style={{ height: 40 }} /> : null
