@@ -28,6 +28,7 @@ jobs:
       - name: Run Update Script
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          TARGET_CHANNEL_ID: ${{ github.event.client_payload.channel_id }}
         run: node scripts/update-streams.js
 
       - name: Commit and Push

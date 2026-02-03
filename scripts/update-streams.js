@@ -32,6 +32,8 @@ function parseISO8601Duration(duration) {
     return h * 3600 + m * 60 + s;
 }
 
+const TARGET_CHANNEL_ID = process.env.TARGET_CHANNEL_ID;
+
 async function update() {
     if (!API_KEY) {
         console.error('YOUTUBE_API_KEY is missing');
@@ -39,73 +41,71 @@ async function update() {
     }
 
     try {
-        console.log('Resolving Uploads Playlist IDs from Channels API...');
-        const channelIds = MEMBERS.map(m => m.id);
+        let existingItems = [];
+        if (fs.existsSync('streams.json')) {
+            try {
+                existingItems = JSON.parse(fs.readFileSync('streams.json', 'utf8'));
+            } catch (e) {
+                existingItems = [];
+            }
+        }
+
+        const isPartialUpdate = !!TARGET_CHANNEL_ID;
+        const targetMembers = isPartialUpdate
+            ? MEMBERS.filter(m => m.id === TARGET_CHANNEL_ID)
+            : MEMBERS;
+
+        if (isPartialUpdate) {
+            console.log(`Partial update triggered for channel: ${TARGET_CHANNEL_ID}`);
+        } else {
+            console.log('Full scheduled update triggered.');
+        }
+
+        console.log('Resolving Uploads Playlist IDs...');
+        const channelIds = targetMembers.map(m => m.id);
         const uploadsMap = await fetchUploadsPlaylistIds(channelIds);
 
-        console.log('Fetching latest items from playlists (max 50)...');
+        console.log('Fetching latest items from playlists...');
         let allVideoIds = [];
-        let fetchedPlaylistsCount = 0;
-
-        // 1. Fetch recent videos/archives
-        const promises = MEMBERS.map(async (member) => {
-            let playlistId = uploadsMap[member.id];
-            let videoIds = [];
-
-            if (playlistId) {
-                videoIds = await fetchRecentVideosFromPlaylist(playlistId);
-            } else {
-                const fallbackPlaylistId = member.id.replace(/^UC/, 'UU');
-                videoIds = await fetchRecentVideosFromPlaylist(fallbackPlaylistId);
-            }
-
-            if (videoIds.length === 0) {
-                console.log(`Playlist fetch failed for ${member.name}, trying Search API...`);
-                videoIds = await fetchVideosBySearch(member.id);
-            }
-
-            if (videoIds.length > 0) fetchedPlaylistsCount++;
-            return videoIds;
+        const playlistPromises = targetMembers.map(async (member) => {
+            let playlistId = uploadsMap[member.id] || member.id.replace(/^UC/, 'UU');
+            return await fetchRecentVideosFromPlaylist(playlistId);
         });
 
-        const results = await Promise.all(promises);
-        results.forEach(ids => allVideoIds.push(...ids));
-        console.log(`Fetched content IDs from ${fetchedPlaylistsCount}/${MEMBERS.length} channels.`);
+        const playlistResults = await Promise.all(playlistPromises);
+        playlistResults.forEach(ids => allVideoIds.push(...ids));
 
-        // 2. Fetch Upcoming Streams (HIGH COST: 100 units)
-        // BALANCED: Run search every 30 minutes to prioritize notification while saving quota.
-        // With a 10-min cron, this will trigger at 00, 30 mins each hour.
-        const currentMinute = new Date().getUTCMinutes();
-        let upcomingIds = [];
-        if (currentMinute % 30 < 10) {
-            console.log('Fetching upcoming streams from Search API (30-min heavy sync)...');
-            upcomingIds = await fetchUpcomingStreams();
-        } else {
-            console.log('Skipping heavy Search API call (10-min light sync)...');
+        // 2. Fetch Upcoming Streams (Skip if partial sync to save quota, unless it's a full sync)
+        if (!isPartialUpdate) {
+            const currentMinute = new Date().getUTCMinutes();
+            if (currentMinute % 30 < 10) {
+                console.log('Fetching upcoming streams from Search API (30-min heavy sync)...');
+                const upcomingIds = await fetchUpcomingStreams();
+                allVideoIds.push(...upcomingIds);
+            }
         }
-        allVideoIds.push(...upcomingIds);
 
-        // Deduplicate
         allVideoIds = [...new Set(allVideoIds)];
-
-        if (allVideoIds.length === 0) {
+        if (allVideoIds.length === 0 && !isPartialUpdate) {
             console.log('No videos found.');
             fs.writeFileSync('streams.json', JSON.stringify([], null, 2));
             return;
         }
 
         console.log(`Verifying details for ${allVideoIds.length} videos...`);
-        let verifiedItems = await fetchVideoDetails(allVideoIds);
+        let newVerifiedItems = await fetchVideoDetails(allVideoIds);
 
-        // Deduplicate items by title and duration
-        const sortedByQuality = verifiedItems.sort((a, b) => {
-            const durA = parseISO8601Duration(a.duration || '');
-            const durB = parseISO8601Duration(b.duration || '');
-            return durB - durA;
-        });
+        // Merge logic: If partial, keep others. If full, replace all.
+        let mergedItems = isPartialUpdate
+            ? existingItems.filter(item => item.channelId !== TARGET_CHANNEL_ID)
+            : [];
+        mergedItems.push(...newVerifiedItems);
 
+        // Deduplicate and Sort
         const uniqueItemsMap = new Map();
-        for (const item of sortedByQuality) {
+        mergedItems.sort((a, b) => parseISO8601Duration(b.duration || '') - parseISO8601Duration(a.duration || ''));
+
+        for (const item of mergedItems) {
             const key = `${item.channelId}_${item.title.trim()}`;
             if (!uniqueItemsMap.has(key)) {
                 uniqueItemsMap.set(key, item);
@@ -119,8 +119,9 @@ async function update() {
             return timeB - timeA;
         });
 
+        finalItems = finalItems.slice(0, 500);
         fs.writeFileSync('streams.json', JSON.stringify(finalItems, null, 2));
-        console.log(`Successfully updated streams.json with ${finalItems.length} unique items.`);
+        console.log(`Update complete. ${finalItems.length} total items in streams.json.`);
     } catch (e) {
         console.error('Update failed:', e.message);
     }
