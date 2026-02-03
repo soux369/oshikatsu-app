@@ -8,6 +8,33 @@ import { useNotifications } from '../src/hooks/useNotifications';
 import { COLORS } from '../src/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 
+const SearchBar = React.memo(({ onChange }: { onChange: (text: string) => void }) => {
+    const [localValue, setLocalValue] = useState('');
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            onChange(localValue);
+        }, 150);
+        return () => clearTimeout(timer);
+    }, [localValue, onChange]);
+
+    return (
+        <View style={styles.searchContainer}>
+            <Ionicons name="search" size={16} color={COLORS.textSecondary} style={{ marginRight: 8 }} />
+            <TextInput
+                style={styles.searchInput}
+                placeholder="検索..."
+                placeholderTextColor={COLORS.textSecondary}
+                value={localValue}
+                onChangeText={setLocalValue}
+                clearButtonMode="while-editing"
+                autoCapitalize="none"
+                autoCorrect={false}
+            />
+        </View>
+    );
+});
+
 export default function VideoListScreen() {
     const [videos, setVideos] = useState<StreamInfo[]>([]);
     const [rawStreams, setRawStreams] = useState<StreamInfo[]>([]);
@@ -16,7 +43,7 @@ export default function VideoListScreen() {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [sortOption, setSortOption] = useState<'date' | 'name'>('date');
+    const [sortOption, setSortOption] = useState<'latest' | 'oldest'>('latest');
 
     const scrollY = useRef(new Animated.Value(0)).current;
     const spinAnim = useRef(new Animated.Value(0)).current;
@@ -44,8 +71,7 @@ export default function VideoListScreen() {
             });
 
             // Sort
-            if (sortOption === 'name') {
-                // Oldest
+            if (sortOption === 'oldest') {
                 filtered.sort((a, b) => {
                     const timeA = new Date(a.scheduledStartTime || 0).getTime();
                     const timeB = new Date(b.scheduledStartTime || 0).getTime();
@@ -96,8 +122,12 @@ export default function VideoListScreen() {
             );
         }
 
-        if (sortOption === 'name') {
-            filtered.sort((a, b) => a.channelTitle.localeCompare(b.channelTitle));
+        if (sortOption === 'oldest') {
+            filtered.sort((a, b) => {
+                const timeA = new Date(a.scheduledStartTime || 0).getTime();
+                const timeB = new Date(b.scheduledStartTime || 0).getTime();
+                return timeA - timeB;
+            });
         } else {
             filtered.sort((a, b) => {
                 const timeA = new Date(a.scheduledStartTime || 0).getTime();
@@ -184,29 +214,24 @@ export default function VideoListScreen() {
 
             <View style={styles.headerControls}>
                 <View style={styles.searchRow}>
-                    <View style={styles.searchContainer}>
-                        <Ionicons name="search" size={16} color={COLORS.textSecondary} style={{ marginRight: 8 }} />
-                        <TextInput
-                            style={styles.searchInput}
-                            placeholder="検索..."
-                            placeholderTextColor={COLORS.textSecondary}
-                            value={searchQuery}
-                            onChangeText={setSearchQuery}
-                            clearButtonMode="while-editing"
-                        />
-                    </View>
+                    <SearchBar onChange={setSearchQuery} />
                     <TouchableOpacity
-                        style={styles.sortToggle}
-                        onPress={() => setSortOption(sortOption === 'date' ? 'name' : 'date')}
-                        activeOpacity={0.7}
+                        style={[styles.sortToggle, sortOption === 'oldest' && styles.sortToggleActive]}
+                        onPress={() => setSortOption(sortOption === 'latest' ? 'oldest' : 'latest')}
+                        activeOpacity={0.8}
                     >
                         <Ionicons
-                            name={sortOption === 'date' ? "time-outline" : "calendar-outline"}
-                            size={18}
-                            color="#fff"
+                            name="chevron-up"
+                            size={14}
+                            color={sortOption === 'oldest' ? "#fff" : "rgba(255,255,255,0.4)"}
+                        />
+                        <Ionicons
+                            name="chevron-down"
+                            size={14}
+                            color={sortOption === 'latest' ? "#fff" : "rgba(255,255,255,0.4)"}
                         />
                         <Text style={styles.sortToggleText}>
-                            {sortOption === 'date' ? '最新' : '古い'}
+                            {sortOption === 'latest' ? '最新' : '古い'}
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -333,15 +358,22 @@ const styles = StyleSheet.create({
     sortToggle: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: COLORS.primary,
+        backgroundColor: '#000',
         borderRadius: 12,
-        paddingHorizontal: 12,
+        paddingHorizontal: 10,
         height: 40,
-        gap: 4,
+        gap: 0,
+        borderWidth: 1,
+        borderColor: '#333',
+    },
+    sortToggleActive: {
+        borderColor: COLORS.primary,
+        backgroundColor: '#111',
     },
     sortToggleText: {
-        fontSize: 13,
+        fontSize: 12,
         color: '#fff',
         fontWeight: 'bold',
+        marginLeft: 6,
     },
 });

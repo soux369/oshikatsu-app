@@ -98,8 +98,8 @@ export default function StreamCard({ stream }: Props) {
     const getStatusBadge = () => {
         if (isShort) {
             return (
-                <View style={[styles.badge, { backgroundColor: '#FF0000', paddingHorizontal: 6 }]}>
-                    <MaterialCommunityIcons name={"play-box-multiple" as any} size={16} color="white" />
+                <View style={[styles.badge, { backgroundColor: '#FF0000', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }]}>
+                    <MaterialCommunityIcons name="play-circle" size={16} color="white" />
                 </View>
             );
         }

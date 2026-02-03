@@ -104,7 +104,7 @@ export default function MemberListScreen() {
                     <View style={styles.header}>
                         <View style={styles.disclaimerBox}>
                             <Text style={styles.headerDisclaimer}>
-                                ※公式とは無関係のファンアプリです
+                                ※本アプリは「あおぎり高校」ファン有志による非公式の応援アプリです。公式（株式会社アップランド）とは一切関係ありません。
                             </Text>
                         </View>
                     </View>
