@@ -75,13 +75,18 @@ async function update() {
         const playlistResults = await Promise.all(playlistPromises);
         playlistResults.forEach(ids => allVideoIds.push(...ids));
 
-        // 2. Fetch Upcoming Streams (Skip if partial sync to save quota, unless it's a full sync)
+        // 2. Fetch Upcoming Streams
+        // If it's a priority full sync (forced) or it's time for the periodic heavy sync
         if (!isPartialUpdate) {
+            const forceSync = process.env.FORCE_UPCOMING_SYNC === 'true';
             const currentMinute = new Date().getUTCMinutes();
-            if (currentMinute % 30 < 10) {
-                console.log('Fetching upcoming streams from Search API (30-min heavy sync)...');
+
+            if (forceSync || currentMinute % 30 < 10) {
+                console.log(forceSync ? 'Forced Priority Sync: Fetching upcoming streams...' : 'Periodic heavy sync: Fetching upcoming streams...');
                 const upcomingIds = await fetchUpcomingStreams();
                 allVideoIds.push(...upcomingIds);
+            } else {
+                console.log('Skipping upcoming check for this cycle to save quota.');
             }
         }
 

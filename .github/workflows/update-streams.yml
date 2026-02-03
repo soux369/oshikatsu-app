@@ -29,6 +29,7 @@ jobs:
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           TARGET_CHANNEL_ID: ${{ github.event.client_payload.channel_id }}
+          FORCE_UPCOMING_SYNC: ${{ github.event_name != 'schedule' }}
           GAS_URL: ${{ secrets.GAS_URL }}
         run: node scripts/update-streams.js
 
