@@ -84,15 +84,23 @@ export default function StreamCard({ stream }: Props) {
             return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
         }
 
-        // For ended (Archive / Video), show relative time if within 6 hours
-        if (diffHrs < 6) {
-            if (diffHrs < 1) {
-                const diffMins = Math.floor(diffMs / (1000 * 60));
-                return `${diffMins || 1}分前`;
-            }
+        // For ended (Archive / Video), show relative time
+        if (diffHrs < 1) {
+            const diffMins = Math.floor(diffMs / (1000 * 60));
+            return `${diffMins || 1}分前`;
+        } else if (diffHrs < 24) {
             return `${diffHrs}時間前`;
         } else {
-            return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+            const diffDays = Math.floor(diffHrs / 24);
+            if (diffDays < 7) {
+                return `${diffDays}日前`;
+            } else if (diffDays < 30) {
+                return `${Math.floor(diffDays / 7)}週間前`;
+            } else if (diffDays < 365) {
+                return `${Math.floor(diffDays / 30)}ヶ月前`;
+            } else {
+                return `${Math.floor(diffDays / 365)}年前`;
+            }
         }
     }, [date, stream.status]);
 
