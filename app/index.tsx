@@ -13,7 +13,7 @@ const normalizeText = (text: string) => {
     return text
         .replace(/[ァ-ン]/g, s => String.fromCharCode(s.charCodeAt(0) - 0x60)) // Katakana to Hiragana
         .replace(/[Ａ-Ｚａ-ｚ０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xfee0)) // Full-width to Half-width
-        .replace(/[ー－‐‑–—―−－⁻₋]/g, '') // Remove all types of long vowels/dashes
+        .replace(/[－‐‑–—―−－⁻₋]/g, 'ー') // Normalize all dashes to the long vowel mark
         .replace(/[\s\t\n\r]/g, '') // Remove all whitespace
         .toLowerCase();
 };
@@ -44,14 +44,14 @@ const isFuzzyMatch = (target: string, query: string) => {
     const nQuery = normalizeText(query);
     if (nTarget.includes(nQuery)) return true;
 
-    // For typos (especially useful for names or titles)
-    // If the query is long enough, allow a small edit distance
-    if (nQuery.length >= 3) {
-        // Optimization: check if target contains a similar substring
+    // For typos: only allow for relatively long queries to avoid false positives
+    // e.g., length 5+ allows 1 typo, length 10+ allows 2 typos
+    if (nQuery.length >= 5) {
+        const threshold = nQuery.length >= 10 ? 2 : 1;
         for (let i = 0; i <= nTarget.length - nQuery.length; i++) {
             const sub = nTarget.substring(i, i + nQuery.length);
             const dist = getLevenshteinDistance(sub, nQuery);
-            if (dist <= 1) return true; // Allow 1 typo
+            if (dist <= threshold) return true;
         }
     }
     return false;

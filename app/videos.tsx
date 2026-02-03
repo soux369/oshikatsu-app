@@ -12,7 +12,7 @@ const normalizeText = (text: string) => {
     return text
         .replace(/[ァ-ン]/g, s => String.fromCharCode(s.charCodeAt(0) - 0x60)) // Katakana to Hiragana
         .replace(/[Ａ-Ｚａ-ｚ０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xfee0)) // Full-width to Half-width
-        .replace(/[ー－‐‑–—―−－⁻₋]/g, '') // Remove all types of long vowels/dashes
+        .replace(/[－‐‑–—―−－⁻₋]/g, 'ー') // Normalize all dashes to the long vowel mark
         .replace(/[\s\t\n\r]/g, '') // Remove all whitespace
         .toLowerCase();
 };
@@ -43,11 +43,13 @@ const isFuzzyMatch = (target: string, query: string) => {
     const nQuery = normalizeText(query);
     if (nTarget.includes(nQuery)) return true;
 
-    if (nQuery.length >= 3) {
+    // For typos: only allow for relatively long queries
+    if (nQuery.length >= 5) {
+        const threshold = nQuery.length >= 10 ? 2 : 1;
         for (let i = 0; i <= nTarget.length - nQuery.length; i++) {
             const sub = nTarget.substring(i, i + nQuery.length);
             const dist = getLevenshteinDistance(sub, nQuery);
-            if (dist <= 1) return true;
+            if (dist <= threshold) return true;
         }
     }
     return false;
