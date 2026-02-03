@@ -42,7 +42,8 @@
       },
       "eas": {
         "projectId": "your-project-id"
-      }
+      },
+      "gasUrl": "https://script.google.com/macros/s/AKfycby12unxMV7upcZLViyQzfRrGsVlIkcQ8zWoZeh_pEhEzUO-NlLvlsH-5Uj92caqQbuukw/exec"
     }
   }
 }

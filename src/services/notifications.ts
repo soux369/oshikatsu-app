@@ -4,8 +4,8 @@ import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import axios from 'axios';
 
-// GASのウェブアプリURLをここに設定
-const GAS_URL = 'あなたのGASウェブアプリURL';
+// GASのウェブアプリURLをExpoの設定から取得
+const GAS_URL = Constants.expoConfig?.extra?.gasUrl;
 
 export async function registerForPushNotificationsAsync() {
     let token;
@@ -37,7 +37,7 @@ export async function registerForPushNotificationsAsync() {
         console.log('Expo Push Token:', token);
 
         // GASにトークンを登録
-        if (GAS_URL && GAS_URL !== 'あなたのGASウェブアプリURL') {
+        if (GAS_URL) {
             try {
                 await axios.post(GAS_URL, {
                     action: 'register',
