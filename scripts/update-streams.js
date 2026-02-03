@@ -73,15 +73,14 @@ async function update() {
         console.log(`Fetched content IDs from ${fetchedPlaylistsCount}/${MEMBERS.length} channels.`);
 
         // 2. Fetch Upcoming Streams (HIGH COST: 100 units)
-        // Only run search if it's the top of the hour or 30 mins past, to save quota.
-        // This allows we to run the sync every 5 mins while staying under 10k/day.
+        // INCREASED FREQUENCY: Run search every 15 minutes to prioritize notification speed.
         const currentMinute = new Date().getUTCMinutes();
         let upcomingIds = [];
-        if (currentMinute % 30 < 5) {
-            console.log('Fetching upcoming streams from Search API (30-min interval heavy sync)...');
+        if (currentMinute % 15 < 5) {
+            console.log('Fetching upcoming streams from Search API (15-min interval notification focus)...');
             upcomingIds = await fetchUpcomingStreams();
         } else {
-            console.log('Skipping heavy Search API call to save quota (Non-heavy sync).');
+            console.log('Skipping heavy Search API call (5-min minor updates)...');
         }
         allVideoIds.push(...upcomingIds);
 
