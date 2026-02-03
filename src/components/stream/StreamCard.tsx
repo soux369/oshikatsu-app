@@ -150,7 +150,7 @@ export default function StreamCard({ stream }: Props) {
                 );
             }
             return (
-                <View style={[styles.badge, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
+                <View style={[styles.badge, { backgroundColor: 'rgba(0,0,0,0.8)' }]}>
                     <View style={styles.badgeContent}>
                         <View style={styles.redDot} />
                         <Text style={styles.badgeText}>動画</Text>
