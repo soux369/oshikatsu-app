@@ -22,6 +22,8 @@ web-build/
 # TypeScript
 *.tsbuildinfo
 
-.agent/
+# Personal Scripts & Tools
+resolve-id*.js
+test-shorts.js
 
 .agent/
