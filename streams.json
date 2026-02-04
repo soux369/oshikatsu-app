@@ -44,25 +44,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/wg_VbUFINHw/hqdefault.jpg",
     "status": "ended",
     "type": "video",
+    "isShort": true,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2026-02-04T09:01:31Z",
     "duration": "PT32S",
-    "updatedAt": "2026-02-04T15:46:22.138Z"
-  },
-  {
-    "id": "tKSYMK1UzMQ",
-    "title": "背後にリアルおかんがいる雑談配信です※変なこと言わせないでください",
-    "thumbnailUrl": "https://i.ytimg.com/vi/tKSYMK1UzMQ/hqdefault.jpg",
-    "status": "ended",
-    "type": "stream",
-    "channelTitle": "たまこ。Ch./あおぎり高校",
-    "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
-    "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
-    "scheduledStartTime": "2026-02-03T13:00:00Z",
-    "duration": "PT1H5M27S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "ZLQd9A8HWb4",
@@ -76,6 +64,20 @@
     "scheduledStartTime": "2026-02-03T13:00:00Z",
     "duration": "PT4H30M52S",
     "updatedAt": "2026-02-04T15:46:22.139Z"
+  },
+  {
+    "id": "tKSYMK1UzMQ",
+    "title": "背後にリアルおかんがいる雑談配信です※変なこと言わせないでください",
+    "thumbnailUrl": "https://i.ytimg.com/vi/tKSYMK1UzMQ/hqdefault.jpg",
+    "status": "ended",
+    "type": "stream",
+    "isShort": false,
+    "channelTitle": "たまこ。Ch./あおぎり高校",
+    "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
+    "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
+    "scheduledStartTime": "2026-02-03T13:00:00Z",
+    "duration": "PT1H5M27S",
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "YEU7bUnoN6E",
@@ -135,12 +137,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/SXFcLnN4WR8/hqdefault.jpg",
     "status": "ended",
     "type": "video",
+    "isShort": true,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2026-02-02T09:00:43Z",
     "duration": "PT28S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "IJAl4iTygbs",
@@ -148,12 +151,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/IJAl4iTygbs/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2026-02-01T13:30:00Z",
     "duration": "PT1H6M32S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "4py2UrNxwm0",
@@ -166,19 +170,6 @@
     "channelThumbnailUrl": "https://yt3.ggpht.com/PQTsSjQKuLXwv22OmnrQC0PwID65eb-0ltBcI29VNcFGvNB-zepdiuPQo-PGBn7kpyHYNS_nxQ=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2026-02-01T13:01:18Z",
     "duration": "PT1H33M16S",
-    "updatedAt": "2026-02-04T15:46:22.140Z"
-  },
-  {
-    "id": "fbll7Hwc2R8",
-    "title": "【 #歌枠 / #karaoke 】初見さん大歓迎！１曲でも聴いていきませんか？聴いてください！！！！聴いて！！！（圧） #vtuber #shorts #vsinger 【我部りえる/あおぎり高校】",
-    "thumbnailUrl": "https://i.ytimg.com/vi/fbll7Hwc2R8/hqdefault_live.jpg",
-    "status": "ended",
-    "type": "stream",
-    "channelTitle": "Rieru Ch. 我部りえる /あおぎり高校",
-    "channelId": "UCFvEuP2EDkvrgJpHI6-pyNw",
-    "channelThumbnailUrl": "https://yt3.ggpht.com/PQTsSjQKuLXwv22OmnrQC0PwID65eb-0ltBcI29VNcFGvNB-zepdiuPQo-PGBn7kpyHYNS_nxQ=s88-c-k-c0x00ffffff-no-rj",
-    "scheduledStartTime": "2026-02-01T12:38:05Z",
-    "duration": "P0D",
     "updatedAt": "2026-02-04T15:46:22.140Z"
   },
   {
@@ -265,12 +256,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/mfg5Monq5Ho/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2026-01-31T14:30:00Z",
     "duration": "PT2H17M18S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "eYtULYwr2L0",
@@ -408,12 +400,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/RCTQf_Gg3gA/hqdefault.jpg",
     "status": "ended",
     "type": "video",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2026-01-30T09:00:49Z",
     "duration": "PT7M17S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "PPcy7TjpwvI",
@@ -533,19 +526,6 @@
     "updatedAt": "2026-02-04T15:46:22.140Z"
   },
   {
-    "id": "jHVr9Pb1cqg",
-    "title": "【ASMR/KU100使用】両耳から最上級の癒しをお届けします…♡【音霊魂子/栗駒こまる】",
-    "thumbnailUrl": "https://i.ytimg.com/vi/jHVr9Pb1cqg/hqdefault.jpg",
-    "status": "ended",
-    "type": "stream",
-    "channelTitle": "たまこ。Ch./あおぎり高校",
-    "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
-    "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
-    "scheduledStartTime": "2026-01-28T13:00:00Z",
-    "duration": "PT40M2S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
-  },
-  {
     "id": "H5jXIHe8pzg",
     "title": "月1歌枠のお時間です【ハロウィン歌枠】 #山黒音玄",
     "thumbnailUrl": "https://i.ytimg.com/vi/H5jXIHe8pzg/hqdefault.jpg",
@@ -557,6 +537,20 @@
     "scheduledStartTime": "2026-01-28T13:00:00Z",
     "duration": "PT1H1M40S",
     "updatedAt": "2026-02-04T15:46:22.139Z"
+  },
+  {
+    "id": "jHVr9Pb1cqg",
+    "title": "【ASMR/KU100使用】両耳から最上級の癒しをお届けします…♡【音霊魂子/栗駒こまる】",
+    "thumbnailUrl": "https://i.ytimg.com/vi/jHVr9Pb1cqg/hqdefault.jpg",
+    "status": "ended",
+    "type": "stream",
+    "isShort": false,
+    "channelTitle": "たまこ。Ch./あおぎり高校",
+    "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
+    "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
+    "scheduledStartTime": "2026-01-28T13:00:00Z",
+    "duration": "PT40M2S",
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "HYveAZPQB7g",
@@ -728,19 +722,6 @@
     "updatedAt": "2026-02-04T15:57:04.964Z"
   },
   {
-    "id": "PlXKRqlhG8A",
-    "title": "ドキドキわくわく福笑いチャレンジ【音霊魂子/栗駒こまる】",
-    "thumbnailUrl": "https://i.ytimg.com/vi/PlXKRqlhG8A/hqdefault.jpg",
-    "status": "ended",
-    "type": "video",
-    "channelTitle": "たまこ。Ch./あおぎり高校",
-    "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
-    "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
-    "scheduledStartTime": "2026-01-25T11:00:00Z",
-    "duration": "PT15M25S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
-  },
-  {
     "id": "OWnVgPobh1M",
     "title": "#01【龍が如く8 外伝】ハワイで夢だった海賊になります【石狩あかり/あおぎり高校】※ネタバレあり",
     "thumbnailUrl": "https://i.ytimg.com/vi/OWnVgPobh1M/hqdefault.jpg",
@@ -752,6 +733,20 @@
     "scheduledStartTime": "2026-01-25T11:00:00Z",
     "duration": "PT3H3M36S",
     "updatedAt": "2026-02-04T15:46:22.139Z"
+  },
+  {
+    "id": "PlXKRqlhG8A",
+    "title": "ドキドキわくわく福笑いチャレンジ【音霊魂子/栗駒こまる】",
+    "thumbnailUrl": "https://i.ytimg.com/vi/PlXKRqlhG8A/hqdefault.jpg",
+    "status": "ended",
+    "type": "video",
+    "isShort": false,
+    "channelTitle": "たまこ。Ch./あおぎり高校",
+    "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
+    "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
+    "scheduledStartTime": "2026-01-25T11:00:00Z",
+    "duration": "PT15M25S",
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "uaFv5CYI8qw",
@@ -837,12 +832,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/fdS6FrASa-0/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2026-01-24T13:00:00Z",
     "duration": "PT2H14M45S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "-YKQ7Nr2Pk0",
@@ -954,12 +950,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/ZnfdYK5B_jI/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2026-01-22T14:00:00Z",
     "duration": "PT1H23M35S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "U1b-8lj0Whg",
@@ -1370,12 +1367,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/X_ub1eHVmtM/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2026-01-17T14:00:00Z",
     "duration": "PT1H35M26S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "DRB2EaM__sU",
@@ -1617,12 +1615,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/WX3ErmvePMM/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2026-01-13T13:00:00Z",
     "duration": "PT2H16M57S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "n5sKlnDMTVI",
@@ -1747,12 +1746,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/QX4830h2TP0/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2026-01-12T03:30:00Z",
     "duration": "PT1H6M2S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "N_YvoMWbcHU",
@@ -1877,12 +1877,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/rYIcnWMp2-o/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2026-01-10T14:00:00Z",
     "duration": "PT1H2M17S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "NX32QCNqt-U",
@@ -2085,12 +2086,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/JNN6Z6QOw14/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2026-01-06T14:00:00Z",
     "duration": "PT41M2S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "4bbQpLv7gzs",
@@ -2189,12 +2191,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/rtfgbmkhTxE/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2026-01-04T14:30:00Z",
     "duration": "PT1H29M10S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "X0TEM7RtuSA",
@@ -2444,19 +2447,6 @@
     "updatedAt": "2026-02-04T15:46:22.140Z"
   },
   {
-    "id": "FXUPq8lrf6k",
-    "title": "あけましておめでと～～～",
-    "thumbnailUrl": "https://i.ytimg.com/vi/FXUPq8lrf6k/hqdefault.jpg",
-    "status": "ended",
-    "type": "stream",
-    "channelTitle": "たまこ。Ch./あおぎり高校",
-    "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
-    "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
-    "scheduledStartTime": "2026-01-01T13:00:00Z",
-    "duration": "PT1H37M8S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
-  },
-  {
     "id": "M9SUHeclwEM",
     "title": "縁起の良い2026年にするためにすることといえば【実写配信】",
     "thumbnailUrl": "https://i.ytimg.com/vi/M9SUHeclwEM/hqdefault.jpg",
@@ -2481,6 +2471,20 @@
     "scheduledStartTime": "2026-01-01T13:00:00Z",
     "duration": "PT2H26M49S",
     "updatedAt": "2026-02-04T15:57:04.964Z"
+  },
+  {
+    "id": "FXUPq8lrf6k",
+    "title": "あけましておめでと～～～",
+    "thumbnailUrl": "https://i.ytimg.com/vi/FXUPq8lrf6k/hqdefault.jpg",
+    "status": "ended",
+    "type": "stream",
+    "isShort": false,
+    "channelTitle": "たまこ。Ch./あおぎり高校",
+    "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
+    "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
+    "scheduledStartTime": "2026-01-01T13:00:00Z",
+    "duration": "PT1H37M8S",
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "6Ae_GKoXNNg",
@@ -2670,12 +2674,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/eodlozQm7Qc/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-12-31T10:00:00Z",
     "duration": "PT1H6M22S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "sUKy9rnHLR8",
@@ -2683,12 +2688,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/sUKy9rnHLR8/hqdefault.jpg",
     "status": "ended",
     "type": "video",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-12-31T09:01:32Z",
     "duration": "PT7M2S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "PwSFAeMrwLo",
@@ -3068,19 +3074,6 @@
     "updatedAt": "2026-02-04T15:46:22.141Z"
   },
   {
-    "id": "ewCqRfQcPJA",
-    "title": "PH0EN1X/石狩あかり #あおぎり高校 #石狩あかり #shorts",
-    "thumbnailUrl": "https://i.ytimg.com/vi/ewCqRfQcPJA/hqdefault.jpg",
-    "status": "ended",
-    "type": "video",
-    "channelTitle": "石狩あかり/あおぎり高校",
-    "channelId": "UC7wZb5INldbGweowOhBIs8Q",
-    "channelThumbnailUrl": "https://yt3.ggpht.com/oHgm1ME0JFIFdwLbo-cogLRgRqP6CLkvA9bOqs2xm1mAuggQRz4ep_A0nx6nbckKcmgRzOFgOz0=s88-c-k-c0x00ffffff-no-rj",
-    "scheduledStartTime": "2025-12-27T10:01:14Z",
-    "duration": "PT27S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
-  },
-  {
     "id": "7atdrS9Ocjo",
     "title": "【質問】第一印象がヤバかったメンバーは❓【あおぎり楽屋裏】#shorts #あおぎり高校 #八十科むじな #ぷわぷわぽぷら",
     "thumbnailUrl": "https://i.ytimg.com/vi/7atdrS9Ocjo/hqdefault.jpg",
@@ -3281,12 +3274,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/pn8EeeoRMxI/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-12-25T10:00:00Z",
     "duration": "PT4H6M46S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "61Ye3YB9nQI",
@@ -3294,12 +3288,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/61Ye3YB9nQI/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-12-24T14:30:00Z",
     "duration": "PT54M6S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "vlRNMyor4-k",
@@ -3450,12 +3445,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/czRvdwvNCTM/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-12-23T11:00:00Z",
     "duration": "PT1H3M59S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "qRhjk6QYtIY",
@@ -3515,12 +3511,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/WPXMvIsb9PY/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-12-21T14:00:00Z",
     "duration": "PT1H43M33S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "q7X-Vu_aJ8U",
@@ -3866,12 +3863,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/Tu2DidOeCUE/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-12-17T11:00:00Z",
     "duration": "PT1H13M39S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "AQzNx_A5wYE",
@@ -4009,12 +4007,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/PkPcy0E7pcA/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-12-14T13:00:00Z",
     "duration": "PT1H44M51S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "kscAscxzUb4",
@@ -4100,12 +4099,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/J3pdy4ebmPU/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-12-13T14:30:00Z",
     "duration": "PT1H44M1S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "SweN-VQfBE4",
@@ -4386,12 +4386,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/tt73hbti9hI/hqdefault.jpg",
     "status": "ended",
     "type": "video",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-12-11T09:01:33Z",
     "duration": "PT34M12S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "ivOvI1JF48Q",
@@ -4451,12 +4452,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/Zuruh79mN2s/hqdefault.jpg",
     "status": "ended",
     "type": "video",
+    "isShort": true,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-12-10T09:01:04Z",
     "duration": "PT29S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "2wOzULd3nPU",
@@ -4529,12 +4531,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/hEH1kCAeMfY/hqdefault.jpg",
     "status": "ended",
     "type": "video",
+    "isShort": true,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-12-09T09:01:10Z",
     "duration": "PT33S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "FfErA60W6SQ",
@@ -4555,12 +4558,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/FeJrNKDPTtg/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-12-08T13:00:00Z",
     "duration": "PT1H3M6S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "e9fmzozcXWs",
@@ -4594,12 +4598,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/aJVimi_WbHk/hqdefault.jpg",
     "status": "ended",
     "type": "video",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-12-08T10:00:00Z",
     "duration": "PT2M57S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "2VplB5FOyVU",
@@ -4633,12 +4638,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/J77IEzyXG4w/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-12-07T14:45:00Z",
     "duration": "PT27M6S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "nFGL2GkByyI",
@@ -4867,12 +4873,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/yTCs_VALOAs/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-12-04T13:30:00Z",
     "duration": "PT1H52M30S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "2EY46inkjlU",
@@ -5023,12 +5030,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/-HeKijWwhEQ/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-12-02T14:30:00Z",
     "duration": "PT1H28M10S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "uJ3OHvtrZ8E",
@@ -5218,12 +5226,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/fBEfC4XskDg/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-11-30T11:30:00Z",
     "duration": "PT56M49S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "Oi1gVgxo2uM",
@@ -5257,12 +5266,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/AXFW8MUAdYo/hqdefault.jpg",
     "status": "ended",
     "type": "video",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-11-30T09:00:15Z",
     "duration": "PT7M40S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "YBwLDEP2zq0",
@@ -5530,12 +5540,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/Yn8CLUaU8dg/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-11-26T14:30:00Z",
     "duration": "PT36M14S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "5PZ43PnO2Tc",
@@ -5569,12 +5580,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/TTrlm6yaD-4/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-11-25T14:50:00Z",
     "duration": "PT38M31S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "yrGaRY_CvDg",
@@ -5673,12 +5685,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/gBvqF8d9zWc/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-11-23T14:30:00Z",
     "duration": "PT2H10M29S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "eGYNSSy98kM",
@@ -5837,19 +5850,6 @@
     "updatedAt": "2026-02-04T15:46:22.140Z"
   },
   {
-    "id": "6MU0DYaDs7M",
-    "title": "【超実写】コラボ中の東京麺珍亭本舗さんで油そば食ってきたー！！【たまこま/音霊魂子/栗駒こまる】",
-    "thumbnailUrl": "https://i.ytimg.com/vi/6MU0DYaDs7M/hqdefault.jpg",
-    "status": "ended",
-    "type": "video",
-    "channelTitle": "たまこ。Ch./あおぎり高校",
-    "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
-    "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
-    "scheduledStartTime": "2025-11-20T11:00:00Z",
-    "duration": "PT8M34S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
-  },
-  {
     "id": "_ojVw5CRV68",
     "title": "【桃鉄２】ギスギス高校再び・・・！！【我部りえる/石狩あかり/山黒音玄/ぷわぷわぽぷら/あおぎり高校】",
     "thumbnailUrl": "https://i.ytimg.com/vi/_ojVw5CRV68/hqdefault.jpg",
@@ -5861,6 +5861,20 @@
     "scheduledStartTime": "2025-11-20T11:00:00Z",
     "duration": "PT2H13M16S",
     "updatedAt": "2026-02-04T15:46:22.140Z"
+  },
+  {
+    "id": "6MU0DYaDs7M",
+    "title": "【超実写】コラボ中の東京麺珍亭本舗さんで油そば食ってきたー！！【たまこま/音霊魂子/栗駒こまる】",
+    "thumbnailUrl": "https://i.ytimg.com/vi/6MU0DYaDs7M/hqdefault.jpg",
+    "status": "ended",
+    "type": "video",
+    "isShort": false,
+    "channelTitle": "たまこ。Ch./あおぎり高校",
+    "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
+    "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
+    "scheduledStartTime": "2025-11-20T11:00:00Z",
+    "duration": "PT8M34S",
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "jk6kev96g-s",
@@ -5907,12 +5921,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/JSSGOK3jOLI/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-11-19T10:30:00Z",
     "duration": "PT56M55S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "8eEDH0AecWI",
@@ -6011,12 +6026,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/DIJAiPWn-Io/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-11-15T15:15:00Z",
     "duration": "PT1H28M3S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "hIiHtZ3yLHY",
@@ -6024,12 +6040,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/hIiHtZ3yLHY/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-11-15T13:00:00Z",
     "duration": "PT1H56M1S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "ld7khqAuHdo",
@@ -6310,12 +6327,13 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/r4et4shlkwA/hqdefault.jpg",
     "status": "ended",
     "type": "stream",
+    "isShort": false,
     "channelTitle": "たまこ。Ch./あおぎり高校",
     "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
     "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
     "scheduledStartTime": "2025-11-10T13:00:00Z",
     "duration": "PT1H47M34S",
-    "updatedAt": "2026-02-04T15:46:22.139Z"
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   },
   {
     "id": "aCcYLQOI1E4",
@@ -6498,5 +6516,33 @@
     "scheduledStartTime": "2025-11-08T10:00:00Z",
     "duration": "PT2H36M44S",
     "updatedAt": "2026-02-04T15:46:22.139Z"
+  },
+  {
+    "id": "6pZWehPKF7c",
+    "title": "明日朝早いから少しだけど一旦集合してや！",
+    "thumbnailUrl": "https://i.ytimg.com/vi/6pZWehPKF7c/hqdefault.jpg",
+    "status": "ended",
+    "type": "stream",
+    "isShort": false,
+    "channelTitle": "たまこ。Ch./あおぎり高校",
+    "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
+    "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
+    "scheduledStartTime": "2025-11-06T12:30:00Z",
+    "duration": "PT33M47S",
+    "updatedAt": "2026-02-04T16:02:49.820Z"
+  },
+  {
+    "id": "ozHe3Vbkd0g",
+    "title": "もぐもぐゥ！！！！！！【多分食いたくなるからリアルでもおにぎり食う朝活/実写】",
+    "thumbnailUrl": "https://i.ytimg.com/vi/ozHe3Vbkd0g/hqdefault.jpg",
+    "status": "ended",
+    "type": "stream",
+    "isShort": false,
+    "channelTitle": "たまこ。Ch./あおぎり高校",
+    "channelId": "UCt7_srJeiw55kTcK7M9ID6g",
+    "channelThumbnailUrl": "https://yt3.ggpht.com/mZMKfTknmgnZ7SCyJ58hsJklu5H0BXZvxfnMoVy9dEOnO9KmAFLqX4LIgKewn2x_NxB1oJTPjg=s88-c-k-c0x00ffffff-no-rj",
+    "scheduledStartTime": "2025-11-04T22:00:00Z",
+    "duration": "PT49M39S",
+    "updatedAt": "2026-02-04T16:02:49.820Z"
   }
 ]
