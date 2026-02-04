@@ -108,10 +108,9 @@ async function update() {
 
         // Deduplicate and Sort
         const uniqueItemsMap = new Map();
-        mergedItems.sort((a, b) => parseISO8601Duration(b.duration || '') - parseISO8601Duration(a.duration || ''));
 
         for (const item of mergedItems) {
-            const key = `${item.channelId}_${item.title.trim()}`;
+            const key = item.id;
             if (!uniqueItemsMap.has(key)) {
                 uniqueItemsMap.set(key, item);
             }
@@ -287,7 +286,18 @@ async function fetchVideoDetails(videoIds) {
             const liveDetails = item.liveStreamingDetails;
             const contentDetails = item.contentDetails;
 
-            const durationSec = parseISO8601Duration(contentDetails?.duration || '');
+            let duration = contentDetails?.duration;
+            const durationSec = parseISO8601Duration(duration || '');
+
+            // For Shorts: If title contains #shorts and duration is under 2 mins, 
+            // ensure it's treated as a short by the app (which expects < 62s)
+            const hasShortsTag = item.snippet.title.toLowerCase().includes('#shorts');
+            if (hasShortsTag && durationSec > 0 && durationSec < 120) {
+                if (durationSec >= 62) {
+                    duration = 'PT60S';
+                }
+            }
+
             const isLongVideo = durationSec > 25 * 60;
 
             let type = liveDetails ? 'stream' : 'video';
@@ -318,7 +328,7 @@ async function fetchVideoDetails(videoIds) {
                 channelId: item.snippet.channelId,
                 channelThumbnailUrl: channelThumbnails[item.snippet.channelId],
                 scheduledStartTime: liveDetails?.scheduledStartTime || item.snippet.publishedAt,
-                duration: contentDetails?.duration,
+                duration: duration,
                 updatedAt: new Date().toISOString()
             };
         });
