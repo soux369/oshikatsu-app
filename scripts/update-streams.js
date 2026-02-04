@@ -92,13 +92,17 @@ async function update() {
 
         allVideoIds = [...new Set(allVideoIds)];
         if (allVideoIds.length === 0 && !isPartialUpdate) {
-            console.log('No videos found.');
-            fs.writeFileSync('streams.json', JSON.stringify([], null, 2));
+            console.log('No videos found. Keeping existing data to avoid empty display.');
             return;
         }
 
         console.log(`Verifying details for ${allVideoIds.length} videos...`);
         let newVerifiedItems = await fetchVideoDetails(allVideoIds);
+
+        if (newVerifiedItems.length === 0 && allVideoIds.length > 0) {
+            console.error('Failed to fetch details for videos. Keeping existing data.');
+            return;
+        }
 
         // Merge logic: If partial, keep others. If full, replace all.
         let mergedItems = isPartialUpdate
@@ -167,6 +171,9 @@ async function update() {
             const isNewlyScheduled = item.status === 'upcoming' && !wasKnown;
 
             if (isNewlyLive || isNewlyScheduled) {
+                // Add timestamp to thumbnail for newly live/scheduled items to bust cache
+                item.thumbnailUrl += `?t=${new Date().getTime()}`;
+
                 pendingNotifications.push({
                     id: item.id,
                     title: item.status === 'live' ? '【ライブ開始】' + item.channelTitle : '【配信予約】' + item.channelTitle,
@@ -208,6 +215,9 @@ async function fetchUploadsPlaylistIds(channelIds) {
         return map;
     } catch (error) {
         console.error('Channels API failed:', error.message);
+        if (error.response?.data?.error?.message) {
+            console.error('Error Details:', error.response.data.error.message);
+        }
         return {};
     }
 }
@@ -376,11 +386,6 @@ async function fetchVideoDetails(videoIds) {
                 item.snippet.thumbnails.high?.url ||
                 item.snippet.thumbnails.medium?.url ||
                 item.snippet.thumbnails.default?.url;
-
-            // Use cache buster for new notifications to force app/CDN refresh
-            if (isNewlyLive || isNewlyScheduled) {
-                thumbnailUrl += `?t=${new Date().getTime()}`;
-            }
 
             let finalTitle = item.snippet.title;
             if (isShort && !finalTitle.toLowerCase().includes('#shorts')) {
