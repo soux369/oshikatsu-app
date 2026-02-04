@@ -120,6 +120,11 @@ async function update() {
         // This happens if a streamer creates a scheduled frame but starts the stream with a different video ID.
         deduplicatedItems = deduplicatedItems.filter(item => {
             if (item.status !== 'upcoming') return true;
+
+            // 「配信予定」かつ「動画の長さが0」のものだけを削除対象とする
+            const durationSec = parseISO8601Duration(item.duration || '');
+            if (durationSec > 0) return true;
+
             const hasActiveVersion = deduplicatedItems.some(other =>
                 other.id !== item.id &&
                 other.channelId === item.channelId &&
