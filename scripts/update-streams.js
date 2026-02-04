@@ -348,10 +348,10 @@ async function fetchVideoDetails(videoIds) {
             let isShort = false;
             // Improved detection: if it has tags, it's likely a short. 
             // If it's under 3 minutes and vertical (checked via URL), it's a short.
-            if (hasShortsTag && durationSec > 0 && durationSec < 181) {
+            if (hasShortsTag && durationSec < 181) {
                 isShort = true;
-            } else if (durationSec > 0 && durationSec < 181 && !liveDetails) {
-                // If duration is under 3 mins and no live details, check URL to be sure (accurate but costs a network request)
+            } else if (durationSec < 181 && !liveDetails) {
+                // If it's a regular video under 3 mins, check URL to be sure
                 isShort = await isVideoShort(item.id);
             }
 

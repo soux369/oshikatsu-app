@@ -137,8 +137,11 @@ export default function StreamCard({ stream }: Props) {
     const getStatusBadge = () => {
         if (isShort) {
             return (
-                <View style={[styles.badge, { backgroundColor: '#FF0000', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }]}>
-                    <MaterialCommunityIcons name="play-circle" size={16} color="white" />
+                <View style={[styles.badge, styles.shortsBadge]}>
+                    <View style={styles.badgeContent}>
+                        <MaterialCommunityIcons name="play-circle" size={14} color="white" style={{ marginRight: 2 }} />
+                        <Text style={styles.badgeText}>Shorts</Text>
+                    </View>
                 </View>
             );
         }
@@ -321,6 +324,12 @@ const styles = StyleSheet.create({
     },
     durationBadge: {
         backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    },
+    shortsBadge: {
+        backgroundColor: '#FF0000',
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 6,
     },
     badgeText: {
         color: 'white',
