@@ -107,19 +107,33 @@ async function update() {
         mergedItems.push(...newVerifiedItems);
 
         // Deduplicate and Sort
-        const uniqueItemsMap = new Map();
+        const idMap = new Map();
 
+        // Use the most recent version of an item if IDs match
         for (const item of mergedItems) {
-            const key = item.id;
-            if (!uniqueItemsMap.has(key)) {
-                uniqueItemsMap.set(key, item);
-            }
+            idMap.set(item.id, item);
         }
+
+        let deduplicatedItems = Array.from(idMap.values());
+
+        // Remove ghost upcoming frames (same title on same channel within 24h of a live/ended one)
+        // This happens if a streamer creates a scheduled frame but starts the stream with a different video ID.
+        deduplicatedItems = deduplicatedItems.filter(item => {
+            if (item.status !== 'upcoming') return true;
+            const hasActiveVersion = deduplicatedItems.some(other =>
+                other.id !== item.id &&
+                other.channelId === item.channelId &&
+                other.title.trim() === item.title.trim() &&
+                other.status !== 'upcoming' &&
+                Math.abs(new Date(other.scheduledStartTime).getTime() - new Date(item.scheduledStartTime).getTime()) < 24 * 3600 * 1000
+            );
+            return !hasActiveVersion;
+        });
 
         const GAS_URL = process.env.GAS_URL;
 
         // Final Sort
-        let finalItems = Array.from(uniqueItemsMap.values());
+        let finalItems = [...deduplicatedItems];
         finalItems.sort((a, b) => {
             const timeA = new Date(a.scheduledStartTime || 0).getTime();
             const timeB = new Date(b.scheduledStartTime || 0).getTime();
