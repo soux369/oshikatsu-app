@@ -116,23 +116,36 @@ async function update() {
 
         let deduplicatedItems = Array.from(idMap.values());
 
-        // Remove ghost upcoming frames (same title on same channel within 24h of a live/ended one)
-        // This happens if a streamer creates a scheduled frame but starts the stream with a different video ID.
+        // Remove redundant frames/ghosts while preserving consecutive streams
         deduplicatedItems = deduplicatedItems.filter(item => {
-            if (item.status !== 'upcoming') return true;
-
-            // 「配信予定」かつ「動画の長さが0」のものだけを削除対象とする
             const durationSec = parseISO8601Duration(item.duration || '');
-            if (durationSec > 0) return true;
 
-            const hasActiveVersion = deduplicatedItems.some(other =>
-                other.id !== item.id &&
-                other.channelId === item.channelId &&
-                other.title.trim() === item.title.trim() &&
-                other.status !== 'upcoming' &&
-                Math.abs(new Date(other.scheduledStartTime).getTime() - new Date(item.scheduledStartTime).getTime()) < 24 * 3600 * 1000
-            );
-            return !hasActiveVersion;
+            // If it has actual content (more than 1 minute), always keep it
+            // This preserves legitimate consecutive streams (e.g. restart after crash)
+            if (durationSec > 60) return true;
+
+            // If it's very short or 0, check if a "better" version exists
+            const hasBetterVersion = deduplicatedItems.some(other => {
+                if (other.id === item.id) return false;
+                if (other.channelId !== item.channelId) return false;
+                if (other.title.trim() !== item.title.trim()) return false;
+
+                const otherDur = parseISO8601Duration(other.duration || '');
+                const timeDiff = Math.abs(new Date(other.scheduledStartTime).getTime() - new Date(item.scheduledStartTime).getTime());
+
+                // Only consider it a duplicate if it's within 24 hours
+                if (timeDiff > 24 * 3600 * 1000) return false;
+
+                // Better version means: 
+                // 1. It's Live
+                // 2. OR it has longer duration than the current one
+                if (other.status === 'live') return true;
+                if (otherDur > durationSec) return true;
+
+                return false;
+            });
+
+            return !hasBetterVersion;
         });
 
         const GAS_URL = process.env.GAS_URL;
