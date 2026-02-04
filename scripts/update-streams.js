@@ -158,27 +158,28 @@ async function update() {
             return timeB - timeA;
         });
 
-        // Notification Logic: Detect new LIVE or UPCOMING streams
-        if (GAS_URL) {
-            const newLiveUpcoming = newVerifiedItems.filter(item => item.status === 'live' || item.status === 'upcoming');
-            for (const item of newLiveUpcoming) {
-                const wasKnown = existingItems.find(ex => ex.id === item.id);
-                const isNewlyLive = item.status === 'live' && (!wasKnown || wasKnown.status !== 'live');
-                const isNewlyScheduled = item.status === 'upcoming' && !wasKnown;
+        // Notification Preparation: Detect new LIVE or UPCOMING streams
+        const pendingNotifications = [];
+        const newLiveUpcoming = newVerifiedItems.filter(item => item.status === 'live' || item.status === 'upcoming');
+        for (const item of newLiveUpcoming) {
+            const wasKnown = existingItems.find(ex => ex.id === item.id);
+            const isNewlyLive = item.status === 'live' && (!wasKnown || wasKnown.status !== 'live');
+            const isNewlyScheduled = item.status === 'upcoming' && !wasKnown;
 
-                if (isNewlyLive || isNewlyScheduled) {
-                    console.log(`New stream detected: ${item.title}. Notifying GAS...`);
-                    try {
-                        await axios.post(GAS_URL, {
-                            action: 'notify',
-                            title: item.status === 'live' ? '【ライブ開始】' + item.channelTitle : '【配信予約】' + item.channelTitle,
-                            body: item.title
-                        });
-                    } catch (err) {
-                        console.error('GAS Notification failed:', err.message);
-                    }
-                }
+            if (isNewlyLive || isNewlyScheduled) {
+                pendingNotifications.push({
+                    id: item.id,
+                    title: item.status === 'live' ? '【ライブ開始】' + item.channelTitle : '【配信予約】' + item.channelTitle,
+                    body: item.title,
+                    thumbnailUrl: item.thumbnailUrl
+                });
             }
+        }
+
+        if (pendingNotifications.length > 0) {
+            if (!fs.existsSync('.github')) fs.mkdirSync('.github');
+            fs.writeFileSync('.github/pending_notifications.json', JSON.stringify(pendingNotifications, null, 2));
+            console.log(`${pendingNotifications.length} notifications queued.`);
         }
 
         finalItems = finalItems.slice(0, 500);
@@ -280,6 +281,24 @@ async function fetchUpcomingStreams() {
     }
 }
 
+async function isVideoShort(videoId) {
+    try {
+        const url = `https://www.youtube.com/shorts/${videoId}`;
+        // Shorts URL returns 200 if it's a short, but redirects (303) to /watch if it's a regular video
+        const response = await axios.get(url, {
+            maxRedirects: 0,
+            validateStatus: (status) => status >= 200 && status < 400,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            },
+            timeout: 5000
+        });
+        return response.status === 200;
+    } catch (e) {
+        return false;
+    }
+}
+
 async function fetchVideoDetails(videoIds) {
     const url = `https://www.googleapis.com/youtube/v3/videos`;
     try {
@@ -313,7 +332,7 @@ async function fetchVideoDetails(videoIds) {
             });
         }
 
-        return allItems.map(item => {
+        const processedItems = await Promise.all(allItems.map(async (item) => {
             let status = item.snippet.liveBroadcastContent;
             const liveDetails = item.liveStreamingDetails;
             const contentDetails = item.contentDetails;
@@ -321,10 +340,20 @@ async function fetchVideoDetails(videoIds) {
             const duration = contentDetails?.duration;
             const durationSec = parseISO8601Duration(duration || '');
 
-            // For Shorts: If title contains #shorts and duration is under 2 mins, 
-            // ensure it's treated as a short by the app
-            const hasShortsTag = item.snippet.title.toLowerCase().includes('#shorts');
-            const isShort = hasShortsTag && durationSec > 0 && durationSec < 120;
+            // Heuristic detection first
+            const title = item.snippet.title.toLowerCase();
+            const description = item.snippet.description.toLowerCase();
+            const hasShortsTag = title.includes('#shorts') || description.includes('#shorts') || title.includes('shorts');
+
+            let isShort = false;
+            // Improved detection: if it has tags, it's likely a short. 
+            // If it's under 3 minutes and vertical (checked via URL), it's a short.
+            if (hasShortsTag && durationSec > 0 && durationSec < 181) {
+                isShort = true;
+            } else if (durationSec > 0 && durationSec < 181 && !liveDetails) {
+                // If duration is under 3 mins and no live details, check URL to be sure (accurate but costs a network request)
+                isShort = await isVideoShort(item.id);
+            }
 
             const isLongVideo = durationSec > 25 * 60;
 
@@ -352,7 +381,7 @@ async function fetchVideoDetails(videoIds) {
                 thumbnailUrl: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
                 status: status,
                 type: type,
-                isShort: isShort, // 新規追加
+                isShort: isShort,
                 channelTitle: item.snippet.channelTitle,
                 channelId: item.snippet.channelId,
                 channelThumbnailUrl: channelThumbnails[item.snippet.channelId],
@@ -360,7 +389,9 @@ async function fetchVideoDetails(videoIds) {
                 duration: duration,
                 updatedAt: new Date().toISOString()
             };
-        });
+        }));
+
+        return processedItems;
     } catch (error) {
         console.error('Video details fetch failed:', error.message);
         return [];

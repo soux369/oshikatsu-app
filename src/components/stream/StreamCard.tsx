@@ -87,16 +87,19 @@ export default function StreamCard({ stream }: Props) {
         if (typeof stream.isShort === 'boolean') {
             return stream.isShort;
         }
-        // フォールバック: 従来の判定（62秒未満）
-        if (!stream.duration) return false;
+        // フォールバック: タイトルに #shorts が含まれるか、2分未満の動画
+        const hasShortsTag = stream.title.toLowerCase().includes('#shorts');
+        if (!stream.duration) return hasShortsTag;
+
         const match = stream.duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-        if (!match) return false;
+        if (!match) return hasShortsTag;
         const h = parseInt(match[1] || '0');
         const m = parseInt(match[2] || '0');
         const s = parseInt(match[3] || '0');
         const totalSec = h * 3600 + m * 60 + s;
-        return totalSec < 62;
-    }, [stream.duration, stream.isShort]);
+
+        return hasShortsTag || (totalSec > 0 && totalSec < 181);
+    }, [stream.duration, stream.isShort, stream.title]);
 
     // Format date/time
     const date = stream.scheduledStartTime ? new Date(stream.scheduledStartTime) : new Date();
