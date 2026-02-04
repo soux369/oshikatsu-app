@@ -342,16 +342,13 @@ async function fetchVideoDetails(videoIds) {
 
             // Heuristic detection first
             const title = item.snippet.title.toLowerCase();
-            const description = item.snippet.description.toLowerCase();
+            const description = (item.snippet.description || '').toLowerCase();
             const hasShortsTag = title.includes('#shorts') || description.includes('#shorts') || title.includes('shorts');
 
             let isShort = false;
-            // Improved detection: if it has tags, it's likely a short. 
-            // If it's under 3 minutes and vertical (checked via URL), it's a short.
             if (hasShortsTag && durationSec < 181) {
                 isShort = true;
-            } else if (durationSec < 181 && !liveDetails) {
-                // If it's a regular video under 3 mins, check URL to be sure
+            } else if (durationSec > 0 && durationSec < 181 && !liveDetails) {
                 isShort = await isVideoShort(item.id);
             }
 

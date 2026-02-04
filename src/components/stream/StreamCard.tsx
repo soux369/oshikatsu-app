@@ -138,10 +138,7 @@ export default function StreamCard({ stream }: Props) {
         if (isShort) {
             return (
                 <View style={[styles.badge, styles.shortsBadge]}>
-                    <View style={styles.badgeContent}>
-                        <MaterialCommunityIcons name="play-circle" size={14} color="white" style={{ marginRight: 2 }} />
-                        <Text style={styles.badgeText}>Shorts</Text>
-                    </View>
+                    <MaterialCommunityIcons name="play-circle" size={16} color="white" />
                 </View>
             );
         }
