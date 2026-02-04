@@ -372,6 +372,16 @@ async function fetchVideoDetails(videoIds) {
                 status = 'ended';
             }
 
+            let thumbnailUrl = item.snippet.thumbnails.maxres?.url ||
+                item.snippet.thumbnails.high?.url ||
+                item.snippet.thumbnails.medium?.url ||
+                item.snippet.thumbnails.default?.url;
+
+            // Use cache buster for new notifications to force app/CDN refresh
+            if (isNewlyLive || isNewlyScheduled) {
+                thumbnailUrl += `?t=${new Date().getTime()}`;
+            }
+
             let finalTitle = item.snippet.title;
             if (isShort && !finalTitle.toLowerCase().includes('#shorts')) {
                 finalTitle += ' #shorts';
@@ -380,7 +390,7 @@ async function fetchVideoDetails(videoIds) {
             return {
                 id: item.id,
                 title: finalTitle,
-                thumbnailUrl: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
+                thumbnailUrl: thumbnailUrl,
                 status: status,
                 type: type,
                 isShort: isShort,
