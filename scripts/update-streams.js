@@ -372,9 +372,14 @@ async function fetchVideoDetails(videoIds) {
                 status = 'ended';
             }
 
+            let finalTitle = item.snippet.title;
+            if (isShort && !finalTitle.toLowerCase().includes('#shorts')) {
+                finalTitle += ' #shorts';
+            }
+
             return {
                 id: item.id,
-                title: item.snippet.title,
+                title: finalTitle,
                 thumbnailUrl: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
                 status: status,
                 type: type,
