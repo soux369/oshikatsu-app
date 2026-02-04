@@ -7,10 +7,11 @@ const PENDING_FILE = '.github/pending_notifications.json';
 async function checkThumbnail(url) {
     if (!url) return true;
     try {
-        const response = await axios.get(url, { timeout: 5000 });
-        // YouTube returns a tiny placeholder if not ready, or a standard response
-        // hqdefault should be around 10-50KB. If it's too small, it might not be ready.
-        return response.status === 200;
+        const response = await axios.head(url, { timeout: 5000 });
+        if (response.status !== 200) return false;
+        const contentLength = parseInt(response.headers['content-length'] || '0');
+        // YouTube placeholders are typically ~1097 bytes. Real ones are > 5000.
+        return contentLength > 2000;
     } catch (e) {
         return false;
     }
@@ -51,7 +52,8 @@ async function run() {
             await axios.post(GAS_URL, {
                 action: 'notify',
                 title: note.title,
-                body: note.body
+                body: note.body,
+                thumbnailUrl: note.thumbnailUrl // Add this
             });
             console.log('  Success.');
         } catch (err) {

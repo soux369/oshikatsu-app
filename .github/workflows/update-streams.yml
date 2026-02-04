@@ -45,6 +45,6 @@ jobs:
         env:
           GAS_URL: ${{ secrets.GAS_URL }}
         run: |
-          echo "Waiting 20 seconds for GitHub Raw CDN to catch up..."
-          sleep 20
+          echo "Waiting 40 seconds for GitHub Raw CDN to catch up..."
+          sleep 40
           node scripts/notify.js
