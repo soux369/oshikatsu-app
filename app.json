@@ -2,7 +2,7 @@
   "expo": {
     "name": "あおぎり通知 （非公式）",
     "slug": "aogiri-oshikatsu-app",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -10,7 +10,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "jp.mono0261.aogirinotify",
-      "buildNumber": "2",
+      "buildNumber": "3",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -21,7 +21,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "jp.mono0261.aogirinotify",
-      "versionCode": 2,
+      "versionCode": 3,
       "permissions": [
         "NOTIFICATIONS"
       ]
