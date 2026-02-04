@@ -318,17 +318,13 @@ async function fetchVideoDetails(videoIds) {
             const liveDetails = item.liveStreamingDetails;
             const contentDetails = item.contentDetails;
 
-            let duration = contentDetails?.duration;
+            const duration = contentDetails?.duration;
             const durationSec = parseISO8601Duration(duration || '');
 
             // For Shorts: If title contains #shorts and duration is under 2 mins, 
-            // ensure it's treated as a short by the app (which expects < 62s)
+            // ensure it's treated as a short by the app
             const hasShortsTag = item.snippet.title.toLowerCase().includes('#shorts');
-            if (hasShortsTag && durationSec > 0 && durationSec < 120) {
-                if (durationSec >= 62) {
-                    duration = 'PT60S';
-                }
-            }
+            const isShort = hasShortsTag && durationSec > 0 && durationSec < 120;
 
             const isLongVideo = durationSec > 25 * 60;
 
@@ -356,6 +352,7 @@ async function fetchVideoDetails(videoIds) {
                 thumbnailUrl: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
                 status: status,
                 type: type,
+                isShort: isShort, // 新規追加
                 channelTitle: item.snippet.channelTitle,
                 channelId: item.snippet.channelId,
                 channelThumbnailUrl: channelThumbnails[item.snippet.channelId],

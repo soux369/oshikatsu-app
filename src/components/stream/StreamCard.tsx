@@ -77,10 +77,17 @@ export default function StreamCard({ stream }: Props) {
         const s = parseInt(match[3] || '0');
 
         if (h > 0) return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        // 0分s秒の場合の表示を改善
+        if (m === 0) return `0:${s.toString().padStart(2, '0')}`;
         return `${m}:${s.toString().padStart(2, '0')}`;
     }, [stream.duration]);
 
     const isShort = React.useMemo(() => {
+        // 新しいプロパティ（GitHub側で判定済み）があればそれを優先
+        if (typeof stream.isShort === 'boolean') {
+            return stream.isShort;
+        }
+        // フォールバック: 従来の判定（62秒未満）
         if (!stream.duration) return false;
         const match = stream.duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
         if (!match) return false;
@@ -89,7 +96,7 @@ export default function StreamCard({ stream }: Props) {
         const s = parseInt(match[3] || '0');
         const totalSec = h * 3600 + m * 60 + s;
         return totalSec < 62;
-    }, [stream.duration]);
+    }, [stream.duration, stream.isShort]);
 
     // Format date/time
     const date = stream.scheduledStartTime ? new Date(stream.scheduledStartTime) : new Date();

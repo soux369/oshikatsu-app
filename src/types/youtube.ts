@@ -44,4 +44,5 @@ export interface StreamInfo {
     channelId: string;
     channelThumbnailUrl?: string; // YouTube channel icon
     duration?: string; // ISO 8601 duration
+    isShort?: boolean; // 新規追加
 }
