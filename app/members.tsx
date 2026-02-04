@@ -136,6 +136,11 @@ export default function MemberListScreen() {
                 keyExtractor={(item) => item.id}
                 renderItem={renderItem}
                 contentContainerStyle={styles.listContent}
+                ListFooterComponent={
+                    <View style={styles.footer}>
+                        <Text style={styles.poweredBy}>Powered by YouTube</Text>
+                    </View>
+                }
                 ListHeaderComponent={
                     <View style={styles.header}>
                         <View style={styles.disclaimerBox}>
@@ -327,5 +332,15 @@ const styles = StyleSheet.create({
     },
     bulkToggleBtn: {
         padding: 4,
+    },
+    footer: {
+        paddingVertical: 24,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    poweredBy: {
+        color: COLORS.textSecondary,
+        fontSize: 12,
+        opacity: 0.6,
     },
 });
