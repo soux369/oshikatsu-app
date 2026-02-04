@@ -98,8 +98,8 @@ export default function StreamCard({ stream }: Props) {
         const s = parseInt(match[3] || '0');
         const totalSec = h * 3600 + m * 60 + s;
 
-        return hasShortsTag || (totalSec > 0 && totalSec < 181);
-    }, [stream.duration, stream.isShort, stream.title]);
+        return hasShortsTag || (totalSec < 181 && stream.status === 'ended');
+    }, [stream.duration, stream.isShort, stream.status, stream.title]);
 
     // Format date/time
     const date = stream.scheduledStartTime ? new Date(stream.scheduledStartTime) : new Date();
@@ -138,7 +138,10 @@ export default function StreamCard({ stream }: Props) {
         if (isShort) {
             return (
                 <View style={[styles.badge, styles.shortsBadge]}>
-                    <MaterialCommunityIcons name="play-circle" size={16} color="white" />
+                    <View style={styles.badgeContent}>
+                        <MaterialCommunityIcons name="play-circle" size={12} color="white" style={{ marginRight: 2 }} />
+                        <Text style={styles.badgeText}>Shorts</Text>
+                    </View>
                 </View>
             );
         }

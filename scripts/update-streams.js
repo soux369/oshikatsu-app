@@ -348,7 +348,7 @@ async function fetchVideoDetails(videoIds) {
             let isShort = false;
             if (hasShortsTag && durationSec < 181) {
                 isShort = true;
-            } else if (durationSec > 0 && durationSec < 181 && !liveDetails) {
+            } else if (durationSec < 181 && !liveDetails) {
                 isShort = await isVideoShort(item.id);
             }
 
