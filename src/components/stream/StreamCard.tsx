@@ -83,23 +83,13 @@ export default function StreamCard({ stream }: Props) {
     }, [stream.duration]);
 
     const isShort = React.useMemo(() => {
-        // 新しいプロパティ（GitHub側で判定済み）があればそれを優先
+        // GitHub側で判定済みのフラグを優先
         if (typeof stream.isShort === 'boolean') {
             return stream.isShort;
         }
-        // フォールバック: タイトルに #shorts が含まれるか、2分未満の動画
-        const hasShortsTag = stream.title.toLowerCase().includes('#shorts');
-        if (!stream.duration) return hasShortsTag;
-
-        const match = stream.duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-        if (!match) return hasShortsTag;
-        const h = parseInt(match[1] || '0');
-        const m = parseInt(match[2] || '0');
-        const s = parseInt(match[3] || '0');
-        const totalSec = h * 3600 + m * 60 + s;
-
-        return hasShortsTag || (totalSec < 181 && stream.status === 'ended');
-    }, [stream.duration, stream.isShort, stream.status, stream.title]);
+        // フォールバック: タイトルに #shorts が含まれるかのみチェック（時間判定は廃止）
+        return stream.title.toLowerCase().includes('#shorts');
+    }, [stream.isShort, stream.title]);
 
     // Format date/time
     const date = stream.scheduledStartTime ? new Date(stream.scheduledStartTime) : new Date();
